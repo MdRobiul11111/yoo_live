@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yoo_live/widget/presentation/root/root_page.dart';
+import 'package:yoo_live/widget/presentation/social_login/user_id_login_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -40,7 +42,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 150),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RootPage()),
+                  );
+                },
                 child: Container(
                   height: 60,
                   width: double.infinity,
@@ -65,7 +72,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 20),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RootPage()),
+                  );
+                },
                 child: Container(
                   height: 60,
                   width: double.infinity,
@@ -90,7 +102,56 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              Image(image: AssetImage("assets/image/Frame 1321318055.png")),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Spacer(),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RootPage()),
+                      );
+                    },
+                    child: Image(
+                      image: AssetImage("assets/image/Frame 1321318055.png"),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserIdLoginPage(),
+                        ),
+                      );
+                    },
+                    child: Image(
+                      image: AssetImage("assets/image/Frame 1321318054.png"),
+                    ),
+                  ),
+                  Spacer(),
+                ],
+              ),
+              Spacer(),
+              Text(
+                "You agree here that you are within all our rules",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                "and regulations.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 60),
             ],
           ),
         ),
