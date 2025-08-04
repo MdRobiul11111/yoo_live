@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:yoo_live/widget/presentation/root/root_page.dart';
 import 'package:yoo_live/widget/presentation/social_login/login_page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(Duration(seconds: 5), (() {
       Navigator.pushReplacement(
         _context,
-        MaterialPageRoute(builder: (context) => CheckUserStatus()),
+        MaterialPageRoute(builder: (context) => LoginPage()),
       );
     }));
   }
@@ -39,30 +37,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
-
-class CheckUserStatus extends StatefulWidget {
-  const CheckUserStatus({super.key});
-
-  @override
-  State<CheckUserStatus> createState() => _CheckUserStatusState();
-}
-
-class _CheckUserStatusState extends State<CheckUserStatus> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if(snapshot.data == null){
-            return LoginPage();
-          }else{
-            return RootPage();
-          }
-        },
-      ),
-    );
-  }
-}
-
