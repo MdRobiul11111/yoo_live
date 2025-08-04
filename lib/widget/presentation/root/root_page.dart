@@ -35,14 +35,17 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home, size: 40), label: ''),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 40),
-            label: 'Home',
+            icon: Icon(Icons.search, size: 40),
+            label: '',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, size: 40),
+            label: '',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home, size: 40), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home, size: 40), label: ''),
         ],
       ),
     );
