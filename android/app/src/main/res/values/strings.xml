@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">yoo live</string>
+    <string name="facebook_app_id">1172582778220506</string>
+    <string name="fb_login_protocol_scheme">fb1172582778220506</string>
+    <string name="facebook_client_token">6b4910bd9aaab107956b9d3cda7d8321</string>
+</resources>
