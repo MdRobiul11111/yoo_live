@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/before_live_interface.dart';
 import 'package:yoo_live/widget/presentation/home/home_page.dart';
@@ -23,8 +24,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   ];
 
   void _onTap(int index) {
-    setState(() {
+    setState(() async {
       _currentIndex = index;
+      await FirebaseAuth.instance.signOut();
     });
   }
 
