@@ -10,6 +10,7 @@ class DioClient {
     dio.options.baseUrl = 'https://yoo-live-q5fs.onrender.com/'; // Base URL for all requests
     dio.options.connectTimeout = const Duration(seconds: 10);
     dio.options.receiveTimeout = const Duration(seconds: 10);
+    dio.interceptors.add(LogInterceptor(requestBody: true,responseBody: true));
   }
 
   Future<ApiResult<T>> apiResponseHandler<T>(
