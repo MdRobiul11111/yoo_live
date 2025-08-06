@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/before_live_interface.dart';
 import 'package:yoo_live/widget/presentation/home/home_page.dart';
@@ -23,8 +22,8 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     Icon(Icons.add),
   ];
 
-  void _onTap(int index) async{
-    setState(() async {
+  void _onTap(int index) {
+    setState(() {
       _currentIndex = index;
     });
   }
@@ -36,7 +35,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTap,
-<<<<<<< HEAD
         selectedItemColor: const Color.fromARGB(255, 240, 3, 82),
         unselectedItemColor: Colors.blue,
         items: [
@@ -65,19 +63,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             icon: Icon(Icons.person, size: 35),
             label: '',
           ),
-=======
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 40),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search',),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
->>>>>>> c12b0a28b39e59c6294dc53f68ca516cf7bd6089
         ],
       ),
     );
