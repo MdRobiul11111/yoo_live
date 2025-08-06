@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
 import 'package:yoo_live/widget/presentation/social_login/user_id_login_page.dart';
 
@@ -10,10 +12,27 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  void signInWithGoogle() {
+    context.read<AuthBloc>().add(SignInWithGoogleRequested());
+  }
+
+  void signInWithFacebook() {
+    context.read<AuthBloc>().add(SignInWithFacebookRequested());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: BlocListener<AuthBloc,AuthState>(listener: (context,state){
+        if (state is AuthStateSuccess) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => RootPage()),
+          );
+        }
+      },
+      child: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.fill,
@@ -41,12 +60,11 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
               SizedBox(height: 150),
+
+              //fb login
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RootPage()),
-                  );
+                    signInWithFacebook();
                 },
                 child: Container(
                   height: 60,
@@ -71,12 +89,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 20),
+
+              //google login
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RootPage()),
-                  );
+                  signInWithGoogle();
                 },
                 child: Container(
                   height: 60,
@@ -103,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 20),
+
               Row(
                 children: [
                   Spacer(),
@@ -155,7 +173,9 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
-      ),
+      ),)
+
+
     );
   }
 }
