@@ -83,7 +83,7 @@ class AuthDataSourceImpl extends AuthDataSource {
               print("User saved successfully $statusCode")
             },
                 (failure, statusCode) => {
-              print("User not saved $statusCode")
+              print("User not saved $failure")
             },
           );
           return userModel;
@@ -98,7 +98,7 @@ class AuthDataSourceImpl extends AuthDataSource {
 
   Future<ApiResult<UserModel>> saveDataToDb(UserModel userModel){
     return _dioClient.apiResponseHandler(
-      'users',
+      'api/v1/auth',
       method: 'POST',
       data: userModel.toJson(),
       parser: (json) {

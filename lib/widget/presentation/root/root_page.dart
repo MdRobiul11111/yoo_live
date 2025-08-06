@@ -20,9 +20,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     Icon(Icons.add),
   ];
 
-  void _onTap(int index) async{
-    setState(() async {
+  void _onTap(int index) {
+    setState(() async{
       _currentIndex = index;
+      await FirebaseAuth.instance.signOut();
     });
   }
 
@@ -40,7 +41,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             icon: Icon(Icons.home, size: 40),
             label: 'Home',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search',),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
