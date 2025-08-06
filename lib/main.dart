@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,8 @@ import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
 import 'package:yoo_live/widget/presentation/splash_widget/splash_screen.dart';
+
+import 'Core/network/DioClient.dart';
 
 final sl = GetIt.instance;
 
@@ -38,7 +41,9 @@ class MyApp extends StatelessWidget {
 }
 
 void initDependency(){
-  sl.registerLazySingleton<AuthDataSource>(()=>AuthDataSourceImpl());
+  sl.registerLazySingleton(() => Dio());
+  sl.registerLazySingleton(()=>DioClient(sl()));
+  sl.registerLazySingleton<AuthDataSource>(()=>AuthDataSourceImpl(dioClient: sl()));
   sl.registerLazySingleton<AuthDataRepository>(()=>AuthDataRepositoryImpl(sl()));
   sl.registerLazySingleton(()=>AuthBloc(sl()));
 }
