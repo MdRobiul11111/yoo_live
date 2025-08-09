@@ -33,3 +33,19 @@ class AuthError extends AuthState{
 
 }
 
+class AuthStateSignedOut extends AuthState{
+  final String message;
+  const AuthStateSignedOut(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+
+class AuthStateSignIn extends AuthState{
+  final String message;
+  const AuthStateSignIn(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
 import 'package:yoo_live/widget/presentation/social_login/login_page.dart';
 
@@ -49,19 +51,30 @@ class CheckUserStatus extends StatefulWidget {
 }
 
 class _CheckUserStatusState extends State<CheckUserStatus> {
+
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<AuthBloc>(context).add(CheckUserSignedIn());
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if(snapshot.data == null){
-            return LoginPage();
-          }else{
-            return RootPage();
-          }
-        },
-      ),
+      body: BlocListener<AuthBloc,AuthState>(listener: (context,state){
+        if(state is AuthStateSignIn){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => RootPage()),
+          );
+        }else{
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        }
+      },child:SizedBox.shrink(),),
     );
   }
 }

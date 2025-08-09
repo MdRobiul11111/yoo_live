@@ -2,9 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yoo_live/Constants/ApiConstants.dart';
 import 'package:yoo_live/Core/Error/Failure.dart';
 import 'package:yoo_live/Core/network/ApiResult.dart';
 import 'package:yoo_live/Core/network/DioClient.dart';
+import 'package:yoo_live/Features/domain/Model/AuthUserModelReponse.dart';
+import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,6 +17,7 @@ import 'package:yoo_live/Features/domain/Service/UserGeolocationService.dart';
 
 abstract class AuthDataSource {
   Future<UserModel> signInWithGoogle();
+
   Future<UserModel> signInWithFacebook();
 }
 
@@ -20,12 +26,14 @@ class AuthDataSourceImpl extends AuthDataSource {
   final GoogleSignIn _googleSignIn;
   final FacebookAuth facebookAuth;
   final DioClient _dioClient;
+  final SharedPreferences sharedPreferences;
 
   AuthDataSourceImpl({
     fb_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FacebookAuth? facebookAuth,
     required DioClient dioClient,
+    required this.sharedPreferences,
   }) : _firebaseAuth = firebaseAuth ?? fb_auth.FirebaseAuth.instance,
        _googleSignIn = googleSignIn ?? GoogleSignIn(),
        facebookAuth = facebookAuth ?? FacebookAuth.instance,
@@ -39,28 +47,41 @@ class AuthDataSourceImpl extends AuthDataSource {
       if (googleUser == null) {
         throw ServerFailure(message: "Google sign in failed");
       }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final fb_auth.AuthCredential credential = fb_auth
-          .GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final fb_auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
-      final geoLocationData = await UserGeolocationService().getCountryCodeFromIp();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-      if (userCredential != null) {
-        final UserModel userModel = UserModel.fromFirebaseUser(
-          userCredential.user!,
-          geoLocationData?.countryCode ?? "not found countryCode",
-          geoLocationData?.city ?? "not found address",
-        );
-        await saveDataToDb(userModel);
-        return userModel;
-      } else {
-        throw ServerFailure(
-          message: "Firebase user not found after Google Sign-In",
-        );
-      }
+      final GoogleSignInTokenResponseModel signInTokenResponseModel =
+          await googleExtractToken(googleAuth.accessToken ?? "");
+
+      final geoLocationData =
+          await UserGeolocationService().getCountryCodeFromIp();
+
+      final UserModel userModel = UserModel(
+        uid: signInTokenResponseModel.sub ?? "",
+        name: signInTokenResponseModel.name ?? "",
+        email: signInTokenResponseModel.email ?? "",
+        country: geoLocationData?.countryCode ?? "",
+        imgUrl: signInTokenResponseModel.picture ?? "",
+      );
+
+      //save user data to Db
+      final authModelResponse = await saveDataToDb(userModel);
+
+      authModelResponse.when(
+        (data, success) => {
+          //save the tokens to sharedPreference
+          sharedPreferences.setString(
+            ApiConstants.accessTokenKey,
+            data.data?.accessToken ?? "",
+          ),
+          sharedPreferences.setString(
+            ApiConstants.refreshTokenKey,
+            data.data?.refreshToken ?? "",
+          ),
+        },
+        (failure, statusCode) => {print(failure)},
+      );
+      return userModel;
     } catch (e) {
       throw ServerFailure(message: e.toString());
     }
@@ -70,41 +91,119 @@ class AuthDataSourceImpl extends AuthDataSource {
   Future<UserModel> signInWithFacebook() async {
     try {
       final LoginResult result = await facebookAuth.login();
-      final fb_auth.OAuthCredential facebookAuthCredential = fb_auth
-          .FacebookAuthProvider.credential(result.accessToken!.tokenString);
-      final fb_auth.UserCredential userCredential = await _firebaseAuth
-          .signInWithCredential(facebookAuthCredential);
+
+      final response = await facebookExtractToken(
+        result.accessToken?.tokenString ?? "",
+      );
       final geoLocationData =
           await UserGeolocationService().getCountryCodeFromIp();
 
-      if (userCredential != null) {
-        final UserModel userModel = UserModel.fromFirebaseUser(
-          userCredential.user!,
-          geoLocationData?.countryCode ?? "not found countryCode",
-          geoLocationData?.city ?? "not found address",
-        );
-        await saveDataToDb(userModel);
-        return userModel;
-      } else {
-        throw ServerFailure(
-          message: "Firebase user not found after Google Sign-In",
-        );
-      }
+      UserModel userModel = UserModel(
+        uid: response.id ?? "",
+        name: response.name ?? "",
+        email: response.email ?? "",
+        country: geoLocationData?.countryCode ?? "",
+        imgUrl: response.picture?.data?.url ?? "",
+      );
+
+      final authModelResponse = await saveDataToDb(userModel);
+
+      authModelResponse.when(
+        (data, success) => {
+          //save the tokens to sharedPreference
+          sharedPreferences.setString(
+            ApiConstants.accessTokenKey,
+            data.data?.accessToken ?? "",
+          ),
+          sharedPreferences.setString(
+            ApiConstants.refreshTokenKey,
+            data.data?.refreshToken ?? "",
+          ),
+        },
+        (failure, statusCode) => {print(failure)},
+      );
+
+      return userModel;
     } catch (e) {
       throw ServerFailure(message: e.toString());
     }
   }
 
-  Future<ApiResult<UserModel>> saveDataToDb(UserModel userModel) {
+  Future<ApiResult<AuthUserModelResponse>> saveDataToDb(UserModel userModel) {
     return _dioClient.apiResponseHandler(
       'api/v1/auth',
       method: 'POST',
-      data: jsonEncode(userModel.toJson()), //have to fix here
+      data: jsonEncode(userModel.toJson()),
       options: Options(headers: {"Content-Type": "application/json"}),
-      parser: (json) {
-        print(json);
-        return json;
-      },
+      parser: (json) => AuthUserModelResponse.fromJson(json),
     );
+  }
+
+  Future<GoogleSignInTokenResponseModel> googleExtractToken(
+    String accessToken,
+  ) async {
+    const String url = "https://www.googleapis.com/oauth2/v3/userinfo";
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        url,
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data;
+
+        final String? sub = data['sub'] as String?;
+        final String? name = data['name'] as String?;
+        final String? givenName = data['given_name'] as String?;
+        final String? familyName = data['family_name'] as String?;
+        final String? email = data['email'] as String?;
+        final String? picture = data['picture'] as String?;
+        final bool? emailVerified = data['email_verified'] as bool?;
+
+        return GoogleSignInTokenResponseModel(
+          sub: sub,
+          name: name,
+          givenName: givenName,
+          familyName: familyName,
+          picture: picture,
+          email: email,
+          emailVerified: emailVerified,
+        );
+      } else {
+        throw Exception('Failed to fetch user data');
+      }
+    } on Exception catch (e) {
+      return throw ServerFailure(message: 'Failed to fetch user data: $e');
+    }
+  }
+
+  Future<FacebookSignInResponseModel> facebookExtractToken(
+    String accessToken,
+  ) async {
+    final String url = "https://graph.facebook.com/me";
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        url,
+        queryParameters: {
+          'access_token': accessToken,
+          'fields': 'id,name,email,picture',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.data);
+        return FacebookSignInResponseModel.fromJson(data);
+      } else {
+        return throw ServerFailure(
+          message: "failed to fetch user data from facebook",
+        );
+      }
+    } catch (e) {
+      return throw ServerFailure(
+        message: "failed to fetch user data from facebook $e",
+      );
+    }
   }
 }

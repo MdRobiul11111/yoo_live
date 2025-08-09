@@ -26,7 +26,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   void _onTap(int index) {
     setState(() async {
       _currentIndex = index;
-      await FirebaseAuth.instance.signOut();
     });
   }
 
