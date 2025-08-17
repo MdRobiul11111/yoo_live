@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/DataSource/LocalDataSource.dart';
-
+import '../../../widget/presentation/root/root_page.dart';
 import '../../data/Entity/UserEntity.dart';
 
 part 'auth_event.dart';
@@ -19,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInWithGoogleRequested>(_onSignInWithGoogleRequested);
     on<SignInWithFacebookRequested>(_onSignInWithFacebookRequested);
     on<CheckUserSignedIn>(_onCheckUserSignedIn);
+    on<AuthNavigation>(_onAuthNavigation);
   }
 
   FutureOr<void> _onSignInWithGoogleRequested(
@@ -55,5 +58,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }else{
       emit(AuthStateSignedOut("User is not signed in"));
     }
+  }
+
+  FutureOr<void> _onAuthNavigation(AuthNavigation event, Emitter<AuthState> emit) {
+    Navigator.pushReplacement(
+      event.context,
+      MaterialPageRoute(builder: (context) => RootPage()),
+    );
   }
 }

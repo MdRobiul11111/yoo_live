@@ -10,3 +10,7 @@ abstract class AuthEvent extends Equatable {
 class SignInWithGoogleRequested extends AuthEvent {}
 class SignInWithFacebookRequested extends AuthEvent {}
 class CheckUserSignedIn extends AuthEvent {}
+class AuthNavigation extends AuthEvent{
+  final BuildContext context;
+  const AuthNavigation(this.context);
+}

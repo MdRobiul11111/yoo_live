@@ -17,25 +17,22 @@ import 'package:yoo_live/Features/domain/Service/UserGeolocationService.dart';
 
 abstract class AuthDataSource {
   Future<UserModel> signInWithGoogle();
-
   Future<UserModel> signInWithFacebook();
+  Future<void> fetchRefreshToken();
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
-  final fb_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final FacebookAuth facebookAuth;
   final DioClient _dioClient;
   final SharedPreferences sharedPreferences;
 
   AuthDataSourceImpl({
-    fb_auth.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FacebookAuth? facebookAuth,
     required DioClient dioClient,
     required this.sharedPreferences,
-  }) : _firebaseAuth = firebaseAuth ?? fb_auth.FirebaseAuth.instance,
-       _googleSignIn = googleSignIn ?? GoogleSignIn(),
+  }) : _googleSignIn = googleSignIn ?? GoogleSignIn(),
        facebookAuth = facebookAuth ?? FacebookAuth.instance,
        _dioClient = dioClient;
 
@@ -205,5 +202,10 @@ class AuthDataSourceImpl extends AuthDataSource {
         message: "failed to fetch user data from facebook $e",
       );
     }
+  }
+
+  @override
+  Future<void> fetchRefreshToken() async {
+    print("fetching token");
   }
 }
