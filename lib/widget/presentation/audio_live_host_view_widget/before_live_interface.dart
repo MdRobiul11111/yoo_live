@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/audio_room_page.dart';
 
 class BeforeLiveScreen extends StatefulWidget {
   const BeforeLiveScreen({super.key});
@@ -136,6 +137,10 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
               child: TextButton.icon(
                 onPressed: () {
                   // Go Live logic
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AudioRoomPage()),
+                  );
                 },
                 icon: const Icon(Icons.graphic_eq, color: Colors.white),
                 label: const Text(

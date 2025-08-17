@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/before_live_interface.dart';
 import 'package:yoo_live/widget/presentation/home/home_page.dart';
 import 'package:yoo_live/widget/presentation/notification_widget/notification_page.dart';
+import 'package:yoo_live/widget/presentation/profile/profile_page.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -20,12 +20,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     Icon(Icons.add),
     BeforeLiveScreen(),
     NotificationPage(),
-    Icon(Icons.add),
+    ProfilePage(),
   ];
 
   void _onTap(int index) {
-    setState(() async {
+    setState(() {
       _currentIndex = index;
+      //  await FirebaseAuth.instance.signOut();
     });
   }
 

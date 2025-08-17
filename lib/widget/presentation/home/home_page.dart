@@ -1,85 +1,335 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
-import 'package:yoo_live/widget/presentation/home/tab_bar_widget/Following_screen.dart';
-import 'package:yoo_live/widget/presentation/home/tab_bar_widget/popular_screen.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  final List<Map<String, dynamic>> banners = [
+    {
+      "title": "Gaming Show",
+      "image": "assets/image/image 258120.png",
+      "viewers": "80.4k",
+      "isLive": true,
+    },
+    {
+      "title": "Music Night",
+      "image": "assets/image/image 258120.png",
+      "viewers": "80.4k",
+      "isLive": false,
+    },
+    {
+      "title": "Dance Party",
+      "image": "assets/image/image 258120.png",
+      "viewers": "80.4k",
+      "isLive": true,
+    },
+  ];
+  final List<Map<String, dynamic>> liveUsers = [
+    {
+      "name": "Nasim iqbal",
+      "image": "assets/image/image 258120.png",
+      "views": 15,
+    },
+    {
+      "name": "Najin Nahar",
+      "image": "assets/image/image 258120.png",
+      "views": 15,
+    },
+    {
+      "name": "Najifa Nafis",
+      "image": "assets/image/image 258120.png",
+      "views": 15,
+    },
+    {
+      "name": "Najin Nahar",
+      "image": "assets/image/image 258120.png",
+      "views": 15,
+    },
+    {
+      "name": "Nasim iqbal",
+      "image": "assets/image/image 258120.png",
+      "views": 30,
+    },
+    {
+      "name": "Najin Nahar",
+      "image": "assets/image/image 258120.png",
+      "views": 41,
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3, // Two tabs: Following, For You
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          toolbarHeight: 70, // adjust height as needed
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Gradient Tab Container
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: TabBar(
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFC5C7D), Color(0xFF6A82FB)],
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            Text(
+              "Yoo Live",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Spacer(),
+            InkWell(
+              onTap: () {},
+              child: Icon(Icons.notifications, color: Colors.white),
+            ),
+            SizedBox(width: 10),
+            InkWell(
+              onTap: () {},
+              child: Icon(Icons.search, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Grid of Live Users
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    children: [
+                      CarouselSlider.builder(
+                        itemCount: banners.length,
+                        itemBuilder: (context, index, realIndex) {
+                          final banner = banners[index];
+                          return Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.asset(
+                                  banner["image"],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
+                              Positioned(
+                                left: 12,
+                                bottom: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.remove_red_eye,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        banner["viewers"],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      if (banner["isLive"])
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            "Live",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                left: 12,
+                                top: 12,
+                                child: Text(
+                                  banner["title"],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(1, 1),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                        options: CarouselOptions(
+                          height: 180,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                          viewportFraction: 0.8,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                    labelPadding: EdgeInsets.symmetric(horizontal: 1),
-                    labelStyle: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.black,
-                    tabs: [
-                      Tab(text: '    Popular     '),
-                      Tab(text: '  Following     '),
-                      Tab(text: '    Games     '),
+
+                      const SizedBox(height: 8),
+
+                      // Dots Indicator
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            banners.asMap().entries.map((entry) {
+                              return Container(
+                                width: _currentIndex == entry.key ? 10.0 : 6.0,
+                                height: 6.0,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 3.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color:
+                                      _currentIndex == entry.key
+                                          ? Colors.pink
+                                          : Colors.grey,
+                                ),
+                              );
+                            }).toList(),
+                      ),
+                      SizedBox(height: 16),
+                      GridView.builder(
+                        itemCount: liveUsers.length,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemBuilder: (context, index) {
+                          final user = liveUsers[index];
+                          return Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  user['image'],
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                left: 8,
+                                top: 8,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.wifi_tethering, size: 14),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Live",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              Positioned(
+                                right: 8,
+                                top: 8,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.remove_red_eye,
+                                        size: 14,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "${user['views']}",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                left: 8,
+                                bottom: 8,
+                                child: Text(
+                                  user['name'],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                        blurRadius: 2,
+                                        color: Colors.black,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
-              ),
-
-              const SizedBox(width: 10),
-
-              // Search Icon
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SearchPage()),
-                  );
-                },
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.search, size: 30, color: Colors.black),
-                ),
-              ),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            // PopularScreen
-            PopularScreen(),
-            //  FollowingScreen
-            FollowingScreen(),
-
-            const Center(
-              child: Text(
-                "comeing soon",
-                style: TextStyle(color: Colors.black),
               ),
             ),
           ],

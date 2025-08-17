@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class PopularScreen extends StatefulWidget {
@@ -6,6 +7,28 @@ class PopularScreen extends StatefulWidget {
 }
 
 class _PopularScreenState extends State<PopularScreen> {
+  int _currentIndex = 0;
+
+  final List<Map<String, dynamic>> banners = [
+    {
+      "title": "Gaming Show",
+      "image": "assets/image/image 258120.png",
+      "viewers": "80.4k",
+      "isLive": true,
+    },
+    {
+      "title": "Music Night",
+      "image": "assets/image/image 258120.png",
+      "viewers": "80.4k",
+      "isLive": false,
+    },
+    {
+      "title": "Dance Party",
+      "image": "assets/image/image 258120.png",
+      "viewers": "80.4k",
+      "isLive": true,
+    },
+  ];
   final List<Map<String, dynamic>> liveUsers = [
     {
       "name": "Nasim iqbal",
@@ -54,21 +77,129 @@ class _PopularScreenState extends State<PopularScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Column(
                     children: [
-                      // Banner
-                      Container(
-                        height: 130,
-                        width: double.infinity,
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            colors: [Colors.pink, Colors.purple],
-                          ),
+                      CarouselSlider.builder(
+                        itemCount: banners.length,
+                        itemBuilder: (context, index, realIndex) {
+                          final banner = banners[index];
+                          return Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.asset(
+                                  banner["image"],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
+                              Positioned(
+                                left: 12,
+                                bottom: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.remove_red_eye,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        banner["viewers"],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      if (banner["isLive"])
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            "Live",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                left: 12,
+                                top: 12,
+                                child: Text(
+                                  banner["title"],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(1, 1),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                        options: CarouselOptions(
+                          height: 180,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                          viewportFraction: 0.8,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
                         ),
-                        child: Text(
-                          "Make a statement.",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Dots Indicator
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            banners.asMap().entries.map((entry) {
+                              return Container(
+                                width: _currentIndex == entry.key ? 10.0 : 6.0,
+                                height: 6.0,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 3.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color:
+                                      _currentIndex == entry.key
+                                          ? Colors.pink
+                                          : Colors.grey,
+                                ),
+                              );
+                            }).toList(),
                       ),
                       SizedBox(height: 16),
                       GridView.builder(
