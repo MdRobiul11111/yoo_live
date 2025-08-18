@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yoo_live/Core/network/AuthInterceptor.dart';
 import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
+import 'package:yoo_live/Features/Bloc/AuthProfileBloc/auth_profile_bloc.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
 import 'package:yoo_live/Features/domain/DataSource/LocalDataSource.dart';
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<AuthBloc>()),
+        BlocProvider(create: (context) => sl<AuthProfileBloc>()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -48,6 +51,8 @@ void initDependency() async{
   sl.registerLazySingleton(()=>DioClient(sl()));
   sl.registerLazySingleton<AuthDataSource>(()=>AuthDataSourceImpl(dioClient: sl(),sharedPreferences: sl()));
   sl.registerLazySingleton<LocalDataSource>(()=>LocalDataSourceImpl(sl()));
+  sl<Dio>().interceptors.add(AuthInterceptor(sl(),sl(),sl()));
   sl.registerLazySingleton<AuthDataRepository>(()=>AuthDataRepositoryImpl(sl()));
   sl.registerLazySingleton(()=>AuthBloc(sl(),sl()));
+  sl.registerLazySingleton(()=>AuthProfileBloc(sl()));
 }

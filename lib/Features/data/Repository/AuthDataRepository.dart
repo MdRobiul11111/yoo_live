@@ -1,11 +1,16 @@
 import 'package:dartz/dartz.dart';
 import 'package:yoo_live/Core/Error/Failure.dart';
+import 'package:yoo_live/Core/network/DioClient.dart';
 import 'package:yoo_live/Features/data/Entity/UserEntity.dart';
 import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
+import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
+import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 
 abstract class AuthDataRepository {
   Future<Either<Failure, UserEntity>> signInWithGoogle();
   Future<Either<Failure, UserEntity>> signInWithFaceBook();
+  Future<Either<Failure, AuthProfile>> fetchProfileDetails();
+  Future<Either<Failure, TokenResponse>>  fetchNewAccessToken();
 }
 
 class AuthDataRepositoryImpl extends AuthDataRepository {
@@ -31,5 +36,23 @@ class AuthDataRepositoryImpl extends AuthDataRepository {
     } catch (e) {
       return left(ServerFailure(message: e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, AuthProfile>> fetchProfileDetails() async{
+    final result = await authDataSource.fetchProfileDetails();
+    return result.when(
+        (data,success)=>Right(data),
+        (failure,statusCode)=>Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, TokenResponse>> fetchNewAccessToken() async{
+    final result = await authDataSource.fetchNewAccessTokenWithRefreshToken();
+    return result.when(
+          (data,success)=>Right(data),
+          (failure,statusCode)=>Left(failure),
+    );
   }
 }

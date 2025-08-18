@@ -7,9 +7,11 @@ import 'package:yoo_live/Constants/ApiConstants.dart';
 import 'package:yoo_live/Core/Error/Failure.dart';
 import 'package:yoo_live/Core/network/ApiResult.dart';
 import 'package:yoo_live/Core/network/DioClient.dart';
+import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/AuthUserModelReponse.dart';
 import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 import 'package:yoo_live/Features/domain/Model/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,7 +20,8 @@ import 'package:yoo_live/Features/domain/Service/UserGeolocationService.dart';
 abstract class AuthDataSource {
   Future<UserModel> signInWithGoogle();
   Future<UserModel> signInWithFacebook();
-  Future<void> fetchRefreshToken();
+  Future<ApiResult<TokenResponse>> fetchNewAccessTokenWithRefreshToken();
+  Future<ApiResult<AuthProfile>> fetchProfileDetails();
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -205,7 +208,27 @@ class AuthDataSourceImpl extends AuthDataSource {
   }
 
   @override
-  Future<void> fetchRefreshToken() async {
-    print("fetching token");
+  Future<ApiResult<TokenResponse>> fetchNewAccessTokenWithRefreshToken() async {
+    final refreshToken = sharedPreferences.getString(ApiConstants.refreshTokenKey);
+
+    return _dioClient.apiResponseHandler(
+      '/api/v1/auth/refresh-token',
+      method: 'PATCH',
+      data: {
+        "refreshToken": refreshToken
+      },
+      parser: (json) {
+        print(json);
+        return TokenResponse.fromJson(json);},
+    );
+  }
+
+  @override
+  Future<ApiResult<AuthProfile>> fetchProfileDetails() {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/profile',
+      method: 'GET',
+      parser: (json) => AuthProfile.fromJson(json),
+    );
   }
 }

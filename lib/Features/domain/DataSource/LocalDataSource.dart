@@ -8,6 +8,8 @@ abstract class LocalDataSource{
   Future<String?> getRefreshToken();
   Future<void> clearUserData();
   Future<bool> isUserSignedIn();
+  Future<void> setNewAccessToken(String newAccessToken);
+  Future<DateTime?> getIssuedAt();
 }
 
 
@@ -24,6 +26,7 @@ class LocalDataSourceImpl extends LocalDataSource {
         sharedPreferences.remove(ApiConstants.accessTokenKey),
         sharedPreferences.remove(ApiConstants.refreshTokenKey),
         sharedPreferences.remove(ApiConstants.userDataKey),
+        sharedPreferences.remove(ApiConstants.issuedAtKey),
       ]);
     } catch (e) {
       throw CacheFailure( message:'Failed to clear user data');
@@ -55,6 +58,34 @@ class LocalDataSourceImpl extends LocalDataSource {
       return refreshToken != null;
     } catch (e) {
       return false;
+    }
+  }
+
+  @override
+  Future<void> setNewAccessToken(String newAccessToken) async{
+    try{
+      await sharedPreferences.setString(ApiConstants.accessTokenKey, newAccessToken);
+      await sharedPreferences.setInt(
+        ApiConstants.issuedAtKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+    }catch(e){
+      throw CacheFailure(message:"Failed to set new access token");
+    }
+  }
+
+  @override
+  Future<DateTime?> getIssuedAt() async{
+    try{
+      final millis = sharedPreferences.getInt(ApiConstants.issuedAtKey);
+      if(millis != null){
+        return DateTime.fromMillisecondsSinceEpoch(millis);
+      }else{
+        return null;
+      }
+
+    }catch(e){
+      return throw CacheFailure(message:"Failed to get validity");
     }
   }
 

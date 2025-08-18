@@ -1,5 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:yoo_live/Core/network/AuthInterceptor.dart';
+import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
+import 'package:yoo_live/Features/domain/DataSource/LocalDataSource.dart';
 
+import '../../main.dart';
 import '../Error/Failure.dart';
 import 'ApiResult.dart';
 
@@ -54,6 +58,13 @@ class DioClient {
             options: options,
           );
           break;
+        case 'PATCH' :
+          response = await dio.patch(
+              path,
+              data: data,
+              queryParameters: queryParameters,
+          );
+
         default:
           throw ArgumentError('Unsupported HTTP method: $method');
       }
