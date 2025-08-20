@@ -10,6 +10,7 @@ import 'package:yoo_live/Core/network/DioClient.dart';
 import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/AuthUserModelReponse.dart';
 import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 import 'package:yoo_live/Features/domain/Model/UserModel.dart';
@@ -22,6 +23,7 @@ abstract class AuthDataSource {
   Future<UserModel> signInWithFacebook();
   Future<ApiResult<TokenResponse>> fetchNewAccessTokenWithRefreshToken();
   Future<ApiResult<AuthProfile>> fetchProfileDetails();
+  Future<ApiResult<SearchProfileResponse>> fetchSearchProfile(String query);
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -225,10 +227,23 @@ class AuthDataSourceImpl extends AuthDataSource {
 
   @override
   Future<ApiResult<AuthProfile>> fetchProfileDetails() {
+    final token = sharedPreferences.getString(ApiConstants.accessTokenKey);
+    print(token);
     return _dioClient.apiResponseHandler(
       '/api/v1/profile',
       method: 'GET',
       parser: (json) => AuthProfile.fromJson(json),
     );
+  }
+
+  @override
+  Future<ApiResult<SearchProfileResponse>> fetchSearchProfile(String query) {
+    return _dioClient.apiResponseHandler(
+        '/api/v1/profile/search',
+        method: 'GET',
+        queryParameters: {
+          'param': query
+        },
+        parser: (json)=>SearchProfileResponse.fromJson(json));
   }
 }

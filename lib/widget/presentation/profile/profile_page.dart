@@ -43,15 +43,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             vertical: 8,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);  //Todo: check this button
-                                },
-                                child: Icon(
-                                    Icons.arrow_back, color: Colors.white),
-                              ),
                               Icon(Icons.edit, color: Colors.white),
                             ],
                           ),

@@ -12,6 +12,7 @@ import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
 import 'package:yoo_live/Features/domain/DataSource/LocalDataSource.dart';
 import 'package:yoo_live/widget/presentation/splash_widget/splash_screen.dart';
 import 'Core/network/DioClient.dart';
+import 'Features/Bloc/SearchProfileBloc/search_profile_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => sl<AuthBloc>()),
         BlocProvider(create: (context) => sl<AuthProfileBloc>()),
+        BlocProvider(create: (context) => sl<SearchProfileBloc>()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -55,4 +57,5 @@ void initDependency() async{
   sl.registerLazySingleton<AuthDataRepository>(()=>AuthDataRepositoryImpl(sl()));
   sl.registerLazySingleton(()=>AuthBloc(sl(),sl()));
   sl.registerLazySingleton(()=>AuthProfileBloc(sl()));
+  sl.registerLazySingleton(()=>SearchProfileBloc(sl()));
 }
