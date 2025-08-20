@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -85,7 +86,12 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(width: 10),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchPage()),
+                );
+              },
               child: Icon(Icons.search, color: Colors.white),
             ),
           ],

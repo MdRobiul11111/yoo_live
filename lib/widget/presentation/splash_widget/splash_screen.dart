@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
@@ -42,7 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-
 class CheckUserStatus extends StatefulWidget {
   const CheckUserStatus({super.key});
 
@@ -51,31 +49,31 @@ class CheckUserStatus extends StatefulWidget {
 }
 
 class _CheckUserStatusState extends State<CheckUserStatus> {
-
   @override
   void initState() {
     super.initState();
     BlocProvider.of<AuthBloc>(context).add(CheckUserSignedIn());
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AuthBloc,AuthState>(listener: (context,state){
-        if(state is AuthStateSignIn){
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => RootPage()),
-          );
-        }else{
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-        }
-      },child:SizedBox.shrink(),),
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthStateSignIn) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => RootPage()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+          }
+        },
+        child: SizedBox.shrink(),
+      ),
     );
   }
 }
-

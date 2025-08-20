@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/call_requests_screen.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/user_room_profile_card.dart';
 
 class AudioRoomPage extends StatelessWidget {
   final List<String> users = List.generate(16, (index) => "Seat ${index + 1}");
+
+  AudioRoomPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +199,15 @@ class AudioRoomPage extends StatelessWidget {
                   return Column(
                     children: [
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          // UserRoomProfileCard_button
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(child: UserRoomProfileCard());
+                            },
+                          );
+                        },
                         child: CircleAvatar(
                           backgroundImage: AssetImage(
                             "assets/image/image 258120.png",
@@ -352,9 +364,16 @@ class AudioRoomPage extends StatelessWidget {
                           ),
                         ),
                         Spacer(),
-                        // call Requests
+                        // call Requests Button
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(child: CallRequestsScreen());
+                              },
+                            );
+                          },
                           child: Icon(
                             Icons.phone,
                             color: Colors.white,
