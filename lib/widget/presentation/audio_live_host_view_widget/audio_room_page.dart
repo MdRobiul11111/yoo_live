@@ -1,58 +1,174 @@
 import 'package:flutter/material.dart';
 
 class AudioRoomPage extends StatelessWidget {
-  final List<String> users = List.generate(10, (index) => "Seat ${index + 1}");
+  final List<String> users = List.generate(16, (index) => "Seat ${index + 1}");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple.shade900,
+      backgroundColor: Color(0xff1E1113),
       body: SafeArea(
         child: Column(
           children: [
-            // 🔼 Top Profile and Timer
+            // 🔼 Top Profile and follow
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.only(left: 12, right: 12),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage("assets/profile.jpg"),
-                    radius: 24,
-                  ),
-                  SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Addar Prohor",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                  Container(
+                    height: 60,
+
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: Color(0xff352C2E),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8, right: 15),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage(
+                              "assets/image/image 258120.png",
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Spacer(),
+                              Text(
+                                "Addar Prohor",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "ID:121511",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.equalizer, color: Colors.white),
+                                ],
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                          SizedBox(width: 10),
+                          // follow button
+                          CircleAvatar(
+                            radius: 17,
+                            backgroundColor: Color(0xffC358C6),
+                            child: Icon(
+                              Icons.add,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        "ID:121511",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ],
+                    ),
                   ),
+
                   Spacer(),
-                  Icon(Icons.star, color: Colors.amber),
-                  SizedBox(width: 4),
-                  Text("15.5k", style: TextStyle(color: Colors.white)),
-                  SizedBox(width: 12),
-                  Icon(Icons.people, color: Colors.pinkAccent),
-                  SizedBox(width: 4),
-                  Text("Top 50+", style: TextStyle(color: Colors.white)),
-                  SizedBox(width: 12),
+
                   Icon(Icons.timer, color: Colors.white),
                   Text(" 1:10:05", style: TextStyle(color: Colors.white)),
                 ],
               ),
             ),
-
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        height: 32,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Color(0xffA46C2F),
+                        ),
+                        child: Row(
+                          children: [
+                            Spacer(),
+                            Text(
+                              "15.5k",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                          ],
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Color(0xffFE9833),
+                        child: Container(
+                          height: 27,
+                          width: 27,
+                          child: Image(
+                            image: AssetImage("assets/icon/diamond 1.png"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 8),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 32,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Color(0xffB460D2),
+                        ),
+                        child: Row(
+                          children: [
+                            Spacer(),
+                            Text(
+                              "15.5k",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: 3.5,
+                          horizontal: 6,
+                        ),
+                        height: 25,
+                        width: 25,
+                        child: Image(
+                          image: AssetImage("assets/icon/coin 1.png"),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             // 👑 Owner Section
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: CircleAvatar(
-                backgroundImage: AssetImage("assets/owner.jpg"),
+                backgroundImage: AssetImage("assets/image/image 258120.png"),
                 radius: 30,
               ),
             ),
@@ -69,24 +185,43 @@ class AudioRoomPage extends StatelessWidget {
               child: GridView.builder(
                 padding: EdgeInsets.all(16),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 3,
+                  crossAxisSpacing: 16,
                   childAspectRatio: 0.8,
                 ),
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
-                      CircleAvatar(
-                        backgroundImage: AssetImage("assets/user.png"),
-                        radius: 30,
+                      InkWell(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          backgroundImage: AssetImage(
+                            "assets/image/image 258120.png",
+                          ),
+                          radius: 25,
+                        ),
                       ),
-                      SizedBox(height: 6),
+                      SizedBox(height: 4),
                       Text(users[index], style: TextStyle(color: Colors.white)),
-                      Text(
-                        "15.5k",
-                        style: TextStyle(color: Colors.amber, fontSize: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 13,
+                            width: 13,
+                            child: Image(
+                              image: AssetImage("assets/icon/diamond 1.png"),
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            "15.5k",
+                            style: TextStyle(color: Colors.amber, fontSize: 12),
+                          ),
+                        ],
                       ),
                     ],
                   );
@@ -97,24 +232,137 @@ class AudioRoomPage extends StatelessWidget {
             // 💬 Chat Messages
             Container(
               padding: EdgeInsets.all(8),
-              height: 100,
+              height: 120,
               child: ListView(
                 children: [
-                  Text(
-                    "Mst. Tiba Akter: How are you?",
-                    style: TextStyle(color: Colors.white),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: Row(
+                      children: [
+                        Stack(
+                          children: [
+                            Container(
+                              height: 20,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color(0xffAA7E59),
+                              ),
+                              child: Row(
+                                children: [
+                                  Spacer(),
+                                  Text(
+                                    "9",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  SizedBox(width: 12),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(),
+                              height: 23,
+                              width: 23,
+                              child: Image(
+                                image: AssetImage(
+                                  "assets/icon/Frame 2147228166.png",
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          "Mst. Tiba Akter: How are you?",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Mst. Habib Khan: How are you?",
-                    style: TextStyle(color: Colors.white),
+                  SizedBox(height: 6),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: Row(
+                      children: [
+                        Stack(
+                          children: [
+                            Container(
+                              height: 20,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color(0xffAA7E59),
+                              ),
+                              child: Row(
+                                children: [
+                                  Spacer(),
+                                  Text(
+                                    "9",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  SizedBox(width: 12),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(),
+                              height: 23,
+                              width: 23,
+                              child: Image(
+                                image: AssetImage(
+                                  "assets/icon/Frame 2147228166.png",
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          "Mst. Habib Khan: How are you?",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Replied Tiba: Vlo achi",
-                    style: TextStyle(color: Colors.white),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: Text(
+                      "Replied Tiba: Vlo achi",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  Text(
-                    "Ratul Entered Room",
-                    style: TextStyle(color: Colors.greenAccent),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 25,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12, right: 12),
+                            child: Text(
+                              "Ratul Entered Room",
+                              style: TextStyle(color: Colors.greenAccent),
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+                        // call Requests
+                        InkWell(
+                          onTap: () {},
+                          child: Icon(
+                            Icons.phone,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -145,7 +393,16 @@ class AudioRoomPage extends StatelessWidget {
                     onPressed: () {},
                   ),
                   IconButton(
+                    icon: Icon(Icons.share, color: Colors.white),
+                    onPressed: () {},
+                  ),
+
+                  IconButton(
                     icon: Icon(Icons.card_giftcard, color: Colors.yellow),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.gas_meter, color: Colors.white),
                     onPressed: () {},
                   ),
                   IconButton(
