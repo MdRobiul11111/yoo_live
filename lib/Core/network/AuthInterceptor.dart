@@ -24,13 +24,13 @@ class AuthInterceptor extends Interceptor {
 
       try {
         final tokenResponse =
-        await authDataSource.fetchNewAccessTokenWithRefreshToken();
+            await authDataSource.fetchNewAccessTokenWithRefreshToken();
 
         await tokenResponse.when((data, success) async {
           await localDataSource.setNewAccessToken(data.data?.accessToken ?? "");
           final newRequest = err.requestOptions;
           newRequest.headers['Authorization'] =
-          'Bearer ${data.data?.accessToken}';
+              'Bearer ${data.data?.accessToken}';
           final response = await dio.fetch(newRequest);
           handler.resolve(response);
         }, (failure, statusCode) => {handler.next(err)});
@@ -46,9 +46,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     try {
       final int expiryMilliSec = 900;
       final issuedAt = await localDataSource.getIssuedAt();
@@ -76,14 +76,17 @@ class AuthInterceptor extends Interceptor {
 
           try {
             final tokenResponse =
-            await authDataSource.fetchNewAccessTokenWithRefreshToken();
+                await authDataSource.fetchNewAccessTokenWithRefreshToken();
 
             await tokenResponse.when(
-                  (data, success) async {
-                await localDataSource.setNewAccessToken(data.data?.accessToken ?? "");
-                options.headers['Authorization'] = 'Bearer ${data.data?.accessToken}';
+              (data, success) async {
+                await localDataSource.setNewAccessToken(
+                  data.data?.accessToken ?? "",
+                );
+                options.headers['Authorization'] =
+                    'Bearer ${data.data?.accessToken}';
               },
-                  (failure, statusCode) {
+              (failure, statusCode) {
                 handler.reject(
                   DioException(
                     requestOptions: options,

@@ -12,8 +12,8 @@ class DioClient {
 
   DioClient(this.dio) {
     dio.options.baseUrl = 'https://yoo-live.onrender.com/'; // Base URL for all requests
-    dio.options.connectTimeout = const Duration(seconds: 40);
-    dio.options.receiveTimeout = const Duration(seconds: 40);
+    dio.options.connectTimeout = const Duration(seconds: 400);
+    dio.options.receiveTimeout = const Duration(seconds: 400);
     dio.interceptors.add(LogInterceptor(requestBody: true,responseBody: true));
   }
 

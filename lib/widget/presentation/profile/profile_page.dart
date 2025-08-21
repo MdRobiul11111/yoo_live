@@ -32,6 +32,56 @@ class _ProfilePageState extends State<ProfilePage> {
                 return Center(child: CircularProgressIndicator());
               }
               else if (state is AuthProfileStateSuccess) {
+
+                final role = state.authProfile.data?.role;
+
+
+                // Define all possible grid items
+                final List<Widget> allGridItems = [
+                  _gridItem(
+                    "assets/icon/Frame 2147228116.png",
+                    "Live history",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228116 (4).png",
+                    "Back Pack",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228116 (1).png",
+                    "My Level",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228116 (3).png",
+                    "Wallet",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228123.png",
+                    "Reseller",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228116 (2).png",
+                    "My Agency",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228116 (5).png",
+                    "Helping",
+                  ),
+                  _gridItem(
+                    "assets/icon/Frame 2147228116 (6).png",
+                    "Admin",
+                  ),
+                ];
+
+                final List<Widget> itemsToShow;
+                if (role == "USER") {
+                  itemsToShow = allGridItems.take(4).toList();
+                } else {
+                  itemsToShow = allGridItems;
+                }
+
+
+
+
                 return SafeArea(
                   child: SingleChildScrollView(
                     child: Column(
@@ -301,7 +351,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                         const SizedBox(height: 15),
-
                         // Grid Icons
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -312,40 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                             physics: NeverScrollableScrollPhysics(),
-                            children: [
-                              _gridItem(
-                                "assets/icon/Frame 2147228116.png",
-                                "Live history",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228116 (4).png",
-                                "Back Pack",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228116 (1).png",
-                                "My Level",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228116 (3).png",
-                                "Wallet",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228123.png",
-                                "Reseller",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228116 (2).png",
-                                "My Agency",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228116 (5).png",
-                                "Helping",
-                              ),
-                              _gridItem(
-                                "assets/icon/Frame 2147228116 (6).png",
-                                "Admin",
-                              ),
-                            ],
+                            children: itemsToShow
                           ),
                         ),
 
