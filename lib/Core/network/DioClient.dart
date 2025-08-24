@@ -1,9 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:yoo_live/Core/network/AuthInterceptor.dart';
-import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
-import 'package:yoo_live/Features/domain/DataSource/LocalDataSource.dart';
 
-import '../../main.dart';
 import '../Error/Failure.dart';
 import 'ApiResult.dart';
 
@@ -11,20 +7,21 @@ class DioClient {
   final Dio dio;
 
   DioClient(this.dio) {
-    dio.options.baseUrl = 'https://yoo-live.onrender.com/'; // Base URL for all requests
+    dio.options.baseUrl =
+        'https://yoo-live.onrender.com/'; // Base URL for all requests
     dio.options.connectTimeout = const Duration(seconds: 400);
     dio.options.receiveTimeout = const Duration(seconds: 400);
-    dio.interceptors.add(LogInterceptor(requestBody: true,responseBody: true));
+    dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
   }
 
   Future<ApiResult<T>> apiResponseHandler<T>(
-      String path, {
-        required T Function(dynamic json) parser,
-        String method = 'GET',
-        Map<String, dynamic>? queryParameters,
-        dynamic data,
-        Options? options,
-      }) async {
+    String path, {
+    required T Function(dynamic json) parser,
+    String method = 'GET',
+    Map<String, dynamic>? queryParameters,
+    dynamic data,
+    Options? options,
+  }) async {
     try {
       Response response;
       switch (method.toUpperCase()) {
@@ -58,11 +55,11 @@ class DioClient {
             options: options,
           );
           break;
-        case 'PATCH' :
+        case 'PATCH':
           response = await dio.patch(
-              path,
-              data: data,
-              queryParameters: queryParameters,
+            path,
+            data: data,
+            queryParameters: queryParameters,
           );
 
         default:
@@ -73,7 +70,10 @@ class DioClient {
         if (response.data == null && T != dynamic) {
           return ApiSuccess(null as T, statusCode: response.statusCode);
         }
-        return ApiSuccess(parser(response.data), statusCode: response.statusCode);
+        return ApiSuccess(
+          parser(response.data),
+          statusCode: response.statusCode,
+        );
       } else {
         return ApiFailure(
           _mapStatusCodeToFailure(response.statusCode!, response.statusMessage),
@@ -85,7 +85,9 @@ class DioClient {
       return ApiFailure(_mapDioExceptionToFailure(e));
     } catch (e) {
       // General unexpected errors
-      return ApiFailure(const ServerFailure(message: 'An unexpected error occurred.'));
+      return ApiFailure(
+        const ServerFailure(message: 'An unexpected error occurred.'),
+      );
     }
   }
 
@@ -106,7 +108,9 @@ class DioClient {
       }
       return const ServerFailure(message: 'An unknown network error occurred.');
     }
-    return ServerFailure(message: e.message ?? 'An unexpected Dio error occurred.');
+    return ServerFailure(
+      message: e.message ?? 'An unexpected Dio error occurred.',
+    );
   }
 
   Failure _mapStatusCodeToFailure(int? statusCode, String? message) {
@@ -122,7 +126,9 @@ class DioClient {
       case 409:
         return ServerFailure(message: message ?? 'Conflict.');
       case 422:
-        return ServerFailure(message: message ?? 'Unprocessable Entity (Validation Failed).');
+        return ServerFailure(
+          message: message ?? 'Unprocessable Entity (Validation Failed).',
+        );
       case 500:
         return ServerFailure(message: message ?? 'Internal Server Error.');
       case 502:
@@ -130,18 +136,19 @@ class DioClient {
       case 503:
         return ServerFailure(message: message ?? 'Service Unavailable.');
       default:
-        return ServerFailure(message: message ?? 'Received invalid status code: $statusCode');
+        return ServerFailure(
+          message: message ?? 'Received invalid status code: $statusCode',
+        );
     }
   }
 }
 
-
 // Extension to add .when() or .fold() for sealed classes
 extension ApiResultExtension<T> on ApiResult<T> {
   R when<R>(
-      R Function(T data, int? statusCode) onSuccess,
-      R Function(Failure failure, int? statusCode) onFailure,
-      ) {
+    R Function(T data, int? statusCode) onSuccess,
+    R Function(Failure failure, int? statusCode) onFailure,
+  ) {
     if (this is ApiSuccess<T>) {
       final success = this as ApiSuccess<T>;
       return onSuccess(success.data, success.statusCode);

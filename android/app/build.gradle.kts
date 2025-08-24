@@ -22,8 +22,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.yoo_live"
-        minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        minSdk = flutter.minSdkVersion
+targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

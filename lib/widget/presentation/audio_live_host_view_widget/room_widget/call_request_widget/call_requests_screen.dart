@@ -12,78 +12,6 @@ class CallRequestsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Top bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 4,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white38,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Spacer(),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(Icons.close, color: Colors.white, size: 28),
-                  ),
-                ],
-              ),
-
-              // Header with buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {},
-                        child: const Text(
-                          "Call Requests",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFD87E82), Color(0xFFE26EE5)],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Joining Call",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
               // Call Request List
               Expanded(
                 child: ListView.builder(
@@ -168,7 +96,7 @@ class CallRequestsScreen extends StatelessWidget {
           ),
 
           // Right Action (Call decline)
-          Icon(Icons.call_end, color: Colors.white, size: 24),
+          Icon(Icons.phone_callback, color: Colors.white, size: 24),
         ],
       ),
     );

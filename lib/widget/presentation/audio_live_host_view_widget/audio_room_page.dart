@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/call_requests_screen.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/call_request_widget/call_request_DefaultTab_button.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/user_room_profile_card.dart';
 
 class AudioRoomPage extends StatelessWidget {
@@ -364,13 +364,22 @@ class AudioRoomPage extends StatelessWidget {
                           ),
                         ),
                         Spacer(),
-                        // call Requests Button
+                        // Call_Request Defaulttab Button
                         InkWell(
                           onTap: () {
                             showModalBottomSheet(
                               context: context,
                               builder: (BuildContext context) {
-                                return Container(child: CallRequestsScreen());
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF3D1E4F),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
+                                  ),
+                                  child: CallRequestDefaulttabButton(),
+                                );
                               },
                             );
                           },

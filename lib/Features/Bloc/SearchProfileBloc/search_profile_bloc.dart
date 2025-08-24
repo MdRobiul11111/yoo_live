@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 
 import '../../domain/Model/SearchProfileResponse.dart';
 
 part 'search_profile_event.dart';
-
 part 'search_profile_state.dart';
 
 class SearchProfileBloc extends Bloc<SearchProfileEvent, SearchProfileState> {
