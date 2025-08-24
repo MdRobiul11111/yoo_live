@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/report_page.dart';
 
 class UserRoomProfileCard extends StatelessWidget {
   const UserRoomProfileCard({super.key});
@@ -25,7 +26,14 @@ class UserRoomProfileCard extends StatelessWidget {
             children: [
               Spacer(),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(child: ReportPage());
+                    },
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xff4C354B),
                   shape: RoundedRectangleBorder(
