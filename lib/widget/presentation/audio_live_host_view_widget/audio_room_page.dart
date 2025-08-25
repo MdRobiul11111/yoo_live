@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/call_request_widget/call_request_DefaultTab_button.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/room_tools_widget/tools_page.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/user_room_profile_card.dart';
 
 class AudioRoomPage extends StatelessWidget {
@@ -65,13 +66,9 @@ class AudioRoomPage extends StatelessWidget {
                           SizedBox(width: 10),
                           // follow button
                           CircleAvatar(
-                            radius: 17,
+                            radius: 15,
                             backgroundColor: Color(0xffC358C6),
-                            child: Icon(
-                              Icons.add,
-                              size: 35,
-                              color: Colors.white,
-                            ),
+                            child: Icon(Icons.add, color: Colors.white),
                           ),
                         ],
                       ),
@@ -79,9 +76,111 @@ class AudioRoomPage extends StatelessWidget {
                   ),
 
                   Spacer(),
+                  Row(
+                    children: [
+                      Stack(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 10,
+                            ),
+                            height: 25,
+                            width: 25,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  "assets/image/image 258120.png",
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                          ),
+                          // fream
+                          SizedBox(
+                            height: 45,
+                            width: 45,
+                            child: Image(
+                              image: AssetImage("assets/icon/frem1.png"),
+                            ),
+                          ),
+                        ],
+                      ),
 
-                  Icon(Icons.timer, color: Colors.white),
-                  Text(" 1:10:05", style: TextStyle(color: Colors.white)),
+                      Stack(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 10,
+                            ),
+                            height: 25,
+                            width: 25,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  "assets/image/image 258120.png",
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                          ), // fream
+                          SizedBox(
+                            height: 45,
+                            width: 45,
+                            child: Image(
+                              image: AssetImage("assets/icon/frem1.png"),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Stack(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 10,
+                            ),
+                            height: 25,
+                            width: 25,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  "assets/image/image 258120.png",
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                          ), // fream
+                          SizedBox(
+                            height: 45,
+                            width: 45,
+                            child: Image(
+                              image: AssetImage("assets/icon/frem1.png"),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 25,
+                        width: 35,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.grey,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "33+",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -115,7 +214,7 @@ class AudioRoomPage extends StatelessWidget {
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: Color(0xffFE9833),
-                        child: Container(
+                        child: SizedBox(
                           height: 27,
                           width: 27,
                           child: Image(
@@ -170,9 +269,29 @@ class AudioRoomPage extends StatelessWidget {
             // 👑 Owner Section
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: CircleAvatar(
-                backgroundImage: AssetImage("assets/image/image 258120.png"),
-                radius: 30,
+              child: Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 11, horizontal: 10),
+                    height: 55,
+                    width: 55,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage("assets/image/image 258120.png"),
+                        fit: BoxFit.fill,
+                      ),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                  ), // fream
+                  SizedBox(
+                    height: 80,
+                    width: 80,
+                    child: Image(
+                      image: AssetImage("assets/icon/frem1.png"),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ],
               ),
             ),
             Text(
@@ -220,7 +339,7 @@ class AudioRoomPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Container(
+                          SizedBox(
                             height: 13,
                             width: 13,
                             child: Image(
@@ -434,7 +553,14 @@ class AudioRoomPage extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Icon(Icons.gamepad, color: Colors.blue),
-                    onPressed: () {},
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Container(child: ToolsPage());
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
