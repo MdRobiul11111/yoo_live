@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yoo_live/Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
 import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,59 +11,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  void fetchLiveRooms() {
+    context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
+  }
 
-  final List<Map<String, dynamic>> banners = [
-    {
-      "title": "Gaming Show",
-      "image": "assets/image/image 258120.png",
-      "viewers": "80.4k",
-      "isLive": true,
-    },
-    {
-      "title": "Music Night",
-      "image": "assets/image/image 258120.png",
-      "viewers": "80.4k",
-      "isLive": false,
-    },
-    {
-      "title": "Dance Party",
-      "image": "assets/image/image 258120.png",
-      "viewers": "80.4k",
-      "isLive": true,
-    },
-  ];
-  final List<Map<String, dynamic>> liveUsers = [
-    {
-      "name": "Nasim iqbal",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Najin Nahar",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Najifa Nafis",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Najin Nahar",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Nasim iqbal",
-      "image": "assets/image/image 258120.png",
-      "views": 30,
-    },
-    {
-      "name": "Najin Nahar",
-      "image": "assets/image/image 258120.png",
-      "views": 41,
-    },
-  ];
+  @override
+  void initState() {
+    fetchLiveRooms();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,248 +56,282 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Grid of Live Users
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    children: [
-                      CarouselSlider.builder(
-                        itemCount: banners.length,
-                        itemBuilder: (context, index, realIndex) {
-                          final banner = banners[index];
-                          return Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Image.asset(
-                                  banner["image"],
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                ),
-                              ),
-                              Positioned(
-                                left: 12,
-                                bottom: 12,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.remove_red_eye,
-                                        color: Colors.white,
-                                        size: 16,
+      body: BlocBuilder<CreatedLiveRoomBloc, CreatedLiveRoomState>(
+        builder: (context, state) {
+          if (state is CreatedLiveRoomLoading) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state is CreatedLiveRoomLoaded) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  // Grid of Live Users
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Column(
+                          children: [
+                            CarouselSlider.builder(
+                              itemCount: state.rooms.data?.length,
+                              itemBuilder: (context, index, realIndex) {
+                                final rooms = state.rooms.data?[index];
+                                return Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.network(
+                                        rooms?.profile ?? "",
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        banner["viewers"],
+                                    ),
+                                    Positioned(
+                                      left: 12,
+                                      bottom: 12,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.5),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.remove_red_eye,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              "${rooms?.callMemberCount ?? 0}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            if (rooms?.isActive??false)
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: const Text(
+                                                  "Live",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: 12,
+                                      top: 12,
+                                      child: Text(
+                                       rooms?.title ?? "",
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black,
+                                              offset: Offset(1, 1),
+                                              blurRadius: 4,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      if (banner["isLive"])
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
+                                    ),
+                                  ],
+                                );
+                              },
+                              options: CarouselOptions(
+                                height: 180,
+                                enlargeCenterPage: true,
+                                autoPlay: true,
+                                viewportFraction: 0.8,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _currentIndex = index;
+                                  });
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            // Dots Indicator
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children:
+                                  state.rooms.data!.asMap().entries.map((entry) {
+                                    return Container(
+                                      width:
+                                          _currentIndex == entry.key
+                                              ? 10.0
+                                              : 6.0,
+                                      height: 6.0,
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 3.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(3),
+                                        color:
+                                            _currentIndex == entry.key
+                                                ? Colors.pink
+                                                : Colors.grey,
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
+                            SizedBox(height: 16),
+
+
+                            GridView.builder(
+                              itemCount: state.rooms.data?.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 0.8,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final rooms = state.rooms.data![index];
+                                return Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.network(
+                                       rooms.profile ?? "",
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    //I want to set a flag here is room isActive this container will show up otherwise not
+                                    if (rooms.isActive ?? false)
+                                      Positioned(
+                                        left: 8,
+                                        top: 8,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.red,
+                                            color: Colors.white.withOpacity(0.8),
                                             borderRadius: BorderRadius.circular(
-                                              8,
+                                              20,
                                             ),
                                           ),
-                                          child: const Text(
-                                            "Live",
-                                            style: TextStyle(
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.wifi_tethering,
+                                                size: 14,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "Live",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                    Positioned(
+                                      right: 8,
+                                      top: 8,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.6),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.remove_red_eye,
+                                              size: 14,
                                               color: Colors.white,
-                                              fontSize: 12,
                                             ),
-                                          ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              "${rooms.callMemberCount ?? 0}",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 12,
-                                top: 12,
-                                child: Text(
-                                  banner["title"],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black,
-                                        offset: Offset(1, 1),
-                                        blurRadius: 4,
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                        options: CarouselOptions(
-                          height: 180,
-                          enlargeCenterPage: true,
-                          autoPlay: true,
-                          viewportFraction: 0.8,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Dots Indicator
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                            banners.asMap().entries.map((entry) {
-                              return Container(
-                                width: _currentIndex == entry.key ? 10.0 : 6.0,
-                                height: 6.0,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 3.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(3),
-                                  color:
-                                      _currentIndex == entry.key
-                                          ? Colors.pink
-                                          : Colors.grey,
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                      SizedBox(height: 16),
-                      GridView.builder(
-                        itemCount: liveUsers.length,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemBuilder: (context, index) {
-                          final user = liveUsers[index];
-                          return Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  user['image'],
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                left: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.wifi_tethering, size: 14),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "Live",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.remove_red_eye,
-                                        size: 14,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "${user['views']}",
+                                    ),
+                                    Positioned(
+                                      left: 8,
+                                      bottom: 8,
+                                      child: Text(
+                                       rooms.title ?? "",
                                         style: TextStyle(
-                                          fontSize: 12,
                                           color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          shadows: [
+                                            Shadow(
+                                              blurRadius: 2,
+                                              color: Colors.black,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 8,
-                                bottom: 8,
-                                child: Text(
-                                  user['name'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 2,
-                                        color: Colors.black,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ],
-        ),
+            );
+          } else if (state is CreatedLiveRoomError) {
+            return Center(
+              child: Text(
+                state.message,
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            );
+          }
+          return SizedBox.shrink();
+        },
       ),
     );
   }

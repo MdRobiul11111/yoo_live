@@ -9,6 +9,7 @@ import 'package:yoo_live/Core/network/ApiResult.dart';
 import 'package:yoo_live/Core/network/DioClient.dart';
 import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/AuthUserModelReponse.dart';
+import 'package:yoo_live/Features/domain/Model/CreatedLiveRoomReponse.dart';
 import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
@@ -24,6 +25,7 @@ abstract class AuthDataSource {
   Future<ApiResult<TokenResponse>> fetchNewAccessTokenWithRefreshToken();
   Future<ApiResult<AuthProfile>> fetchProfileDetails();
   Future<ApiResult<SearchProfileResponse>> fetchSearchProfile(String query);
+  Future<ApiResult<CreatedLiveRoomResponse>> fetchListOfRooms();
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -245,5 +247,13 @@ class AuthDataSourceImpl extends AuthDataSource {
           'param': query
         },
         parser: (json)=>SearchProfileResponse.fromJson(json));
+  }
+
+  @override
+  Future<ApiResult<CreatedLiveRoomResponse>> fetchListOfRooms() {
+    return _dioClient.apiResponseHandler(
+        '/api/v1/rooms',
+        method: 'GET',
+        parser: (json)=>CreatedLiveRoomResponse.fromJson(json));
   }
 }

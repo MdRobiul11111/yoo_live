@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yoo_live/Core/network/AuthInterceptor.dart';
 import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
 import 'package:yoo_live/Features/Bloc/AuthProfileBloc/auth_profile_bloc.dart';
+import 'package:yoo_live/Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
 import 'package:yoo_live/Features/domain/DataSource/LocalDataSource.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<AuthBloc>()),
         BlocProvider(create: (context) => sl<AuthProfileBloc>()),
         BlocProvider(create: (context) => sl<SearchProfileBloc>()),
+        BlocProvider(create: (context) => sl<CreatedLiveRoomBloc>()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -58,4 +60,5 @@ void initDependency() async{
   sl.registerLazySingleton(()=>AuthBloc(sl(),sl()));
   sl.registerLazySingleton(()=>AuthProfileBloc(sl()));
   sl.registerLazySingleton(()=>SearchProfileBloc(sl()));
+  sl.registerLazySingleton(()=>CreatedLiveRoomBloc(sl()));
 }

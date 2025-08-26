@@ -7,6 +7,8 @@ import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 
+import '../../domain/Model/CreatedLiveRoomReponse.dart';
+
 abstract class AuthDataRepository {
   Future<Either<Failure, UserEntity>> signInWithGoogle();
 
@@ -19,6 +21,8 @@ abstract class AuthDataRepository {
   Future<Either<Failure, SearchProfileResponse>> fetchSearchProfile(
     String query,
   );
+
+  Future<Either<Failure, CreatedLiveRoomResponse>> fetchListOfRooms();
 }
 
 class AuthDataRepositoryImpl extends AuthDataRepository {
@@ -69,6 +73,15 @@ class AuthDataRepositoryImpl extends AuthDataRepository {
     String query,
   ) async {
     final searchResponse = await authDataSource.fetchSearchProfile(query);
+    return searchResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, CreatedLiveRoomResponse>> fetchListOfRooms() async{
+    final searchResponse = await authDataSource.fetchListOfRooms();
     return searchResponse.when(
       (data, success) => Right(data),
       (failure, statusCode) => Left(failure),

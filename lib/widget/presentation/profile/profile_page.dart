@@ -32,10 +32,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 return Center(child: CircularProgressIndicator());
               }
               else if (state is AuthProfileStateSuccess) {
-
-                final role = state.authProfile.data?.role;
-
-
                 // Define all possible grid items
                 final List<Widget> allGridItems = [
                   _gridItem(
@@ -71,15 +67,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     "Admin",
                   ),
                 ];
-
-                final List<Widget> itemsToShow;
-                if (role == "USER") {
-                  itemsToShow = allGridItems.take(4).toList();
-                } else {
-                  itemsToShow = allGridItems;
-                }
-
-
 
 
                 return SafeArea(
@@ -361,7 +348,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                             physics: NeverScrollableScrollPhysics(),
-                            children: itemsToShow
+                            children: allGridItems
                           ),
                         ),
 
