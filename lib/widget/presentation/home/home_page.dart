@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
+import 'package:yoo_live/widget/presentation/notification_widget/notification_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           children: [
             Text(
-              "Yoo Live",
+              "Dark Live",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -81,7 +82,12 @@ class _HomePageState extends State<HomePage> {
             ),
             Spacer(),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
+                );
+              },
               child: Icon(Icons.notifications, color: Colors.white),
             ),
             SizedBox(width: 10),
