@@ -263,6 +263,11 @@ class AudioRoomPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Spacer(),
+                  InkWell(
+                    onTap: () {},
+                    child: Icon(Icons.logout, color: Colors.white, size: 30),
+                  ),
                 ],
               ),
             ),
@@ -535,25 +540,49 @@ class AudioRoomPage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.mic, color: Colors.white),
+                    icon: Icon(Icons.mic, size: 32, color: Colors.white),
                     onPressed: () {},
                   ),
-                  IconButton(
-                    icon: Icon(Icons.share, color: Colors.white),
-                    onPressed: () {},
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      height: 25,
+                      width: 25,
+                      child: Image(
+                        image: AssetImage("assets/icon/Vector.png"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 17),
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      height: 32,
+                      width: 32,
+                      child: Image(
+                        image: AssetImage("assets/icon/Simplification (8).png"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 17),
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      height: 32,
+                      width: 32,
+                      child: Image(
+                        image: AssetImage("assets/icon/Simplification (9).png"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
 
                   IconButton(
-                    icon: Icon(Icons.card_giftcard, color: Colors.yellow),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.gas_meter, color: Colors.white),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.gamepad, color: Colors.blue),
+                    icon: Icon(Icons.gamepad, size: 32, color: Colors.blue),
                     onPressed: () {
+                      // ToolsPage
                       showModalBottomSheet(
                         context: context,
                         builder: (BuildContext context) {
