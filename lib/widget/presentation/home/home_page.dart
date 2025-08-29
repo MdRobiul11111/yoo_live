@@ -2,8 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
+import 'package:yoo_live/Features/Bloc/RoomBloc/room_bloc.dart';
 import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
 import 'package:yoo_live/widget/presentation/notification_widget/notification_page.dart';
+
+import '../audio_live_host_view_widget/audio_room_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,9 +15,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+
   void fetchLiveRooms() {
     context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
   }
+
+  void navigateToRoom(String roomId){
+    context.read<RoomBloc>().add(FetchSingleRoomDetailsEvent(roomId));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AudioRoomPage()),
+    );
+  }
+
 
   @override
   void initState() {
@@ -222,30 +235,64 @@ class _HomePageState extends State<HomePage> {
                                   ),
                               itemBuilder: (context, index) {
                                 final rooms = state.rooms.data![index];
-                                return Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                       rooms.profile ?? "",
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        fit: BoxFit.cover,
+                                return InkWell(
+                                  onTap:(){
+                                    navigateToRoom(rooms.sId!);
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(
+                                         rooms.profile ?? "",
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                    ),
 
-                                    //I want to set a flag here is room isActive this container will show up otherwise not
-                                    if (rooms.isActive ?? false)
+                                      //I want to set a flag here is room isActive this container will show up otherwise not
+                                      if (rooms.isActive ?? false)
+                                        Positioned(
+                                          left: 8,
+                                          top: 8,
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.8),
+                                              borderRadius: BorderRadius.circular(
+                                                20,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.wifi_tethering,
+                                                  size: 14,
+                                                ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Live",
+                                                  style: TextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
                                       Positioned(
-                                        left: 8,
+                                        right: 8,
                                         top: 8,
                                         child: Container(
                                           padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
+                                            horizontal: 6,
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.8),
+                                            color: Colors.black.withOpacity(0.6),
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
@@ -253,70 +300,41 @@ class _HomePageState extends State<HomePage> {
                                           child: Row(
                                             children: [
                                               Icon(
-                                                Icons.wifi_tethering,
+                                                Icons.remove_red_eye,
                                                 size: 14,
+                                                color: Colors.white,
                                               ),
                                               SizedBox(width: 4),
                                               Text(
-                                                "Live",
-                                                style: TextStyle(fontSize: 12),
+                                                "${rooms.callMemberCount ?? 0}",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
-
-                                    Positioned(
-                                      right: 8,
-                                      top: 8,
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.6),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
+                                      Positioned(
+                                        left: 8,
+                                        bottom: 8,
+                                        child: Text(
+                                         rooms.title ?? "",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            shadows: [
+                                              Shadow(
+                                                blurRadius: 2,
+                                                color: Colors.black,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.remove_red_eye,
-                                              size: 14,
-                                              color: Colors.white,
-                                            ),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              "${rooms.callMemberCount ?? 0}",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                       ),
-                                    ),
-                                    Positioned(
-                                      left: 8,
-                                      bottom: 8,
-                                      child: Text(
-                                       rooms.title ?? "",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          shadows: [
-                                            Shadow(
-                                              blurRadius: 2,
-                                              color: Colors.black,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 );
                               },
                             ),

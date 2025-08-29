@@ -10,9 +10,11 @@ import 'package:yoo_live/Core/network/DioClient.dart';
 import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/AuthUserModelReponse.dart';
 import 'package:yoo_live/Features/domain/Model/CreatedLiveRoomReponse.dart';
+import 'package:yoo_live/Features/domain/Model/CreatingRoomResponse.dart';
 import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 import 'package:yoo_live/Features/domain/Model/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
@@ -21,11 +23,20 @@ import 'package:yoo_live/Features/domain/Service/UserGeolocationService.dart';
 
 abstract class AuthDataSource {
   Future<UserModel> signInWithGoogle();
+
   Future<UserModel> signInWithFacebook();
+
   Future<ApiResult<TokenResponse>> fetchNewAccessTokenWithRefreshToken();
+
   Future<ApiResult<AuthProfile>> fetchProfileDetails();
+
   Future<ApiResult<SearchProfileResponse>> fetchSearchProfile(String query);
+
   Future<ApiResult<CreatedLiveRoomResponse>> fetchListOfRooms();
+
+  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom);
+
+  Future<ApiResult<SingleRoomResponse>> fetchSingleRoom(String roomId);
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -139,7 +150,9 @@ class AuthDataSourceImpl extends AuthDataSource {
       method: 'POST',
       data: jsonEncode(userModel.toJson()),
       options: Options(headers: {"Content-Type": "application/json"}),
-      parser: (json) => AuthUserModelResponse.fromJson(json),
+      parser: (json) {
+        print(json);
+        return AuthUserModelResponse.fromJson(json);},
     );
   }
 
@@ -213,24 +226,23 @@ class AuthDataSourceImpl extends AuthDataSource {
 
   @override
   Future<ApiResult<TokenResponse>> fetchNewAccessTokenWithRefreshToken() async {
-    final refreshToken = sharedPreferences.getString(ApiConstants.refreshTokenKey);
+    final refreshToken = sharedPreferences.getString(
+      ApiConstants.refreshTokenKey,
+    );
 
     return _dioClient.apiResponseHandler(
       '/api/v1/auth/refresh-token',
       method: 'PATCH',
-      data: {
-        "refreshToken": refreshToken
-      },
+      data: {"refreshToken": refreshToken},
       parser: (json) {
         print(json);
-        return TokenResponse.fromJson(json);},
+        return TokenResponse.fromJson(json);
+      },
     );
   }
 
   @override
   Future<ApiResult<AuthProfile>> fetchProfileDetails() {
-    final token = sharedPreferences.getString(ApiConstants.accessTokenKey);
-    print(token);
     return _dioClient.apiResponseHandler(
       '/api/v1/profile',
       method: 'GET',
@@ -241,19 +253,46 @@ class AuthDataSourceImpl extends AuthDataSource {
   @override
   Future<ApiResult<SearchProfileResponse>> fetchSearchProfile(String query) {
     return _dioClient.apiResponseHandler(
-        '/api/v1/profile/search',
-        method: 'GET',
-        queryParameters: {
-          'param': query
-        },
-        parser: (json)=>SearchProfileResponse.fromJson(json));
+      '/api/v1/profile/search',
+      method: 'GET',
+      queryParameters: {'param': query},
+      parser: (json) => SearchProfileResponse.fromJson(json),
+    );
   }
 
   @override
   Future<ApiResult<CreatedLiveRoomResponse>> fetchListOfRooms() {
     return _dioClient.apiResponseHandler(
-        '/api/v1/rooms',
+      '/api/v1/rooms',
+      method: 'GET',
+      parser: (json) => CreatedLiveRoomResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) {
+    final formData = FormData.fromMap({
+      'title': dataForRoom.title,
+      'category': dataForRoom.category,
+      'seat': dataForRoom.seat,
+      'image':dataForRoom.imageFilePath
+    });
+
+
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms',
+      method: 'POST',
+      data: formData,
+      parser: (json) => CreatingRoomResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<SingleRoomResponse>> fetchSingleRoom(String roomId) {
+      return _dioClient.apiResponseHandler(
+        '/api/v1/rooms/$roomId',
         method: 'GET',
-        parser: (json)=>CreatedLiveRoomResponse.fromJson(json));
+        parser: (json) => SingleRoomResponse.fromJson(json),
+      );
   }
 }

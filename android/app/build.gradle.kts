@@ -23,9 +23,10 @@ android {
     defaultConfig {
         applicationId = "com.example.yoo_live"
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
