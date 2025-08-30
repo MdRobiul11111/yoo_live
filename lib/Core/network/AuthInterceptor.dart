@@ -13,7 +13,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
+    if (err.response?.statusCode == 400) {
       // Prevent multiple concurrent refresh attempts
       if (_isRefreshing) {
         return handler.next(err);

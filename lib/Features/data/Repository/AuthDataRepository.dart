@@ -5,7 +5,11 @@ import 'package:yoo_live/Features/data/Entity/UserEntity.dart';
 import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
 import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
+import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
+
+import '../../domain/Model/CreatedLiveRoomReponse.dart';
+import '../../domain/Model/CreatingRoomResponse.dart';
 
 abstract class AuthDataRepository {
   Future<Either<Failure, UserEntity>> signInWithGoogle();
@@ -19,6 +23,11 @@ abstract class AuthDataRepository {
   Future<Either<Failure, SearchProfileResponse>> fetchSearchProfile(
     String query,
   );
+
+  Future<Either<Failure, CreatedLiveRoomResponse>> fetchListOfRooms();
+  Future<Either<Failure, CreatingRoomResponse>> createRoom(DataForRoom dataForRoom);
+  Future<Either<Failure, SingleRoomResponse>> fetchSingleRoom(String roomId);
+
 }
 
 class AuthDataRepositoryImpl extends AuthDataRepository {
@@ -70,6 +79,32 @@ class AuthDataRepositoryImpl extends AuthDataRepository {
   ) async {
     final searchResponse = await authDataSource.fetchSearchProfile(query);
     return searchResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, CreatedLiveRoomResponse>> fetchListOfRooms() async{
+    final searchResponse = await authDataSource.fetchListOfRooms();
+    return searchResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) {
+    return authDataSource.createRoom(dataForRoom).then((value) => value.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    ));
+  }
+
+  @override
+  Future<Either<Failure, SingleRoomResponse>> fetchSingleRoom(String roomId) async{
+    final roomModelResponse = await authDataSource.fetchSingleRoom(roomId);
+    return roomModelResponse.when(
       (data, success) => Right(data),
       (failure, statusCode) => Left(failure),
     );
