@@ -22,12 +22,3 @@ class CreateRoomFailure extends CreateRoomState {
 }
 
 
-class AuthProfileDetails extends CreateRoomState{
-  final AuthProfile authProfile;
-
-  AuthProfileDetails(this.authProfile);
-
-  @override
-  List<Object?> get props => [authProfile];
-}
-

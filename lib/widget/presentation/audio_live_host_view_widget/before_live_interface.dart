@@ -79,12 +79,11 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
           if (state is CreateRoomLoading) {
             Center(child: CircularProgressIndicator());
           } else if (state is CreateRoomSuccess) {
+            final roomId = state.creatingRoomResponse.data?.sId;
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AudioRoomPage()),
+              MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId!)),
             );
-          } else if (state is AuthProfileDetails) {
-            role = state.authProfile.data?.role;
           }
         },
         child: Padding(
@@ -220,8 +219,7 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
                 ),
                 child: TextButton.icon(
                   onPressed: () {
-                    if (textEditingController.text.isNotEmpty &&
-                        role == "ADMIN" && selectedImagePath != null) {
+                    if (textEditingController.text.isNotEmpty && selectedImagePath != null) {
                       DataForRoom dataForRoom = DataForRoom(
                         textEditingController.text,
                         selectedCategory.toUpperCase(),

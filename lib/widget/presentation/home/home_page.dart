@@ -21,10 +21,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateToRoom(String roomId){
-    context.read<RoomBloc>().add(FetchSingleRoomDetailsEvent(roomId));
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AudioRoomPage()),
+      MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId,)),
     );
   }
 

@@ -24,4 +24,3 @@ class CreatedLiveRoomError extends CreatedLiveRoomState {
   List<Object> get props => [message];
 }
 
-

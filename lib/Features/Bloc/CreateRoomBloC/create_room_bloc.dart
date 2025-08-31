@@ -14,7 +14,6 @@ class CreateRoomBloc extends Bloc<CreateRoomEvent, CreateRoomState> {
 
   CreateRoomBloc(this.authDataRepository) : super(CreateRoomInitial()) {
     on<CreateRoom>(_onCreateRoom);
-    on<FetchProfileDetails>(_onFetchProfileDetails);
   }
 
   FutureOr<void> _onCreateRoom(CreateRoom event, Emitter<CreateRoomState> emit) async{
@@ -23,15 +22,6 @@ class CreateRoomBloc extends Bloc<CreateRoomEvent, CreateRoomState> {
     response.fold(
       (failure) => emit(CreateRoomFailure('$failure')),
       (data) => emit(CreateRoomSuccess(data)),
-    );
-  }
-
-
-  FutureOr<void> _onFetchProfileDetails(FetchProfileDetails event, Emitter<CreateRoomState> emit) async{
-    final profileResponse = await authDataRepository.fetchProfileDetails();
-    profileResponse.fold(
-      (failure) => emit(CreateRoomFailure('$failure')),
-      (data) => emit(AuthProfileDetails(data)),
     );
   }
 }
