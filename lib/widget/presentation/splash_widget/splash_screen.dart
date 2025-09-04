@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/AuthBloc/auth_bloc.dart';
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
-import 'package:yoo_live/widget/presentation/social_login/login_page.dart';
+import 'package:yoo_live/widget/presentation/splash_widget/welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,10 +31,10 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     _context = context;
     return Scaffold(
-      backgroundColor: Color(0xff070125),
+      backgroundColor: Color(0xff000015),
       body: Center(
         child: SizedBox(
-          child: Image.asset('assets/image/yoolive.jpg', fit: BoxFit.cover),
+          child: Image.asset("assets/image/dark.jpg", fit: BoxFit.cover),
         ),
       ),
     );
@@ -68,7 +68,7 @@ class _CheckUserStatusState extends State<CheckUserStatus> {
           } else {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
+              MaterialPageRoute(builder: (context) => WelcomeScreen()),
             );
           }
         },

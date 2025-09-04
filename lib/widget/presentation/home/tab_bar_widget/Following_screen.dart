@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
-class FollowingScreen extends StatefulWidget {
-  @override
-  State<FollowingScreen> createState() => _FollowingScreenState();
-}
-
-class _FollowingScreenState extends State<FollowingScreen> {
+class FollowingScreen extends StatelessWidget {
   final List<Map<String, dynamic>> liveUsers = [
     {
       "name": "Nasim iqbal",

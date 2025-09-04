@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "YOO Live",
+                      "Drak Live",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 40,
