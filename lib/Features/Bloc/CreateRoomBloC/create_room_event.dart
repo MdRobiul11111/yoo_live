@@ -10,8 +10,6 @@ abstract class CreateRoomEvent extends Equatable{
 
 }
 
-
-
 class CreateRoom extends CreateRoomEvent{
   final DataForRoom dataForRoom;
 

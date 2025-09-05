@@ -13,37 +13,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedIndex = 0;
-
-  final List<String> categories = [
-    "All",
-    "Popular",
-    "Following",
-    "Games",
-    "Shop",
-  ];
-
-  final List<Widget> pages = [
-    Text("Popular Page", style: TextStyle(fontSize: 24, color: Colors.amber)),
-
-    Text("Popular Page", style: TextStyle(fontSize: 24, color: Colors.amber)),
-    Center(child: Text("Following Page", style: TextStyle(fontSize: 24))),
-    Center(child: Text("Games Page", style: TextStyle(fontSize: 24))),
-    Center(child: Text("Shop Page", style: TextStyle(fontSize: 24))),
-  ];
   int _currentIndex = 0;
 
   void fetchLiveRooms() {
     context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
   }
 
+  Future<void> _onRefresh() async {
+    context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
+    // Wait for the bloc to complete the fetch operation
+    await Future.delayed(Duration(milliseconds: 500));
+  }
+
   void navigateToRoom(String roomId) {
-    context.read<RoomBloc>().add(FetchSingleRoomDetailsEvent(roomId));
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AudioRoomPage()),
+      MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId,)),
     );
   }
+
 
   @override
   void initState() {
@@ -101,21 +89,25 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   // Grid of Live Users
                   Expanded(
-                    child: SingleChildScrollView(
+                    child: RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      color: Colors.white,
+                      backgroundColor: Colors.pink,
+                      child: SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Column(
                           children: [
                             CarouselSlider.builder(
-                              itemCount: state.rooms.data?.length,
+                              itemCount: state.sliderResponse.data?.length,
                               itemBuilder: (context, index, realIndex) {
-                                final rooms = state.rooms.data?[index];
+                                final rooms = state.sliderResponse.data?[index];
                                 return Stack(
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: Image.network(
-                                        rooms?.profile ?? "",
+                                        rooms?.imageUrl ?? "",
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                       ),
@@ -141,26 +133,18 @@ class _HomePageState extends State<HomePage> {
                                               color: Colors.white,
                                               size: 16,
                                             ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              "${rooms?.callMemberCount ?? 0}",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                              ),
-                                            ),
                                             const SizedBox(width: 8),
-                                            if (rooms?.isActive ?? false)
+                                            if (rooms?.status=="ACTIVE")
                                               Container(
                                                 padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2,
-                                                    ),
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 2,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   color: Colors.red,
                                                   borderRadius:
-                                                      BorderRadius.circular(8),
+                                                  BorderRadius.circular(8),
                                                 ),
                                                 child: const Text(
                                                   "Live",
@@ -215,115 +199,44 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children:
-                                  state.rooms.data!.asMap().entries.map((
-                                    entry,
-                                  ) {
-                                    return Container(
-                                      width:
-                                          _currentIndex == entry.key
-                                              ? 10.0
-                                              : 6.0,
-                                      height: 6.0,
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 3.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(3),
-                                        color:
-                                            _currentIndex == entry.key
-                                                ? Colors.pink
-                                                : Colors.grey,
-                                      ),
-                                    );
-                                  }).toList(),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  "Categories",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Spacer(),
-                                TextButton(
-                                  onPressed: () {},
-                                  child: const Text(
-                                    "View All",
-                                    style: TextStyle(color: Colors.white),
+                              state.sliderResponse.data!.asMap().entries.map((entry) {
+                                return Container(
+                                  width:
+                                  _currentIndex == entry.key
+                                      ? 10.0
+                                      : 6.0,
+                                  height: 6.0,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 3.0,
                                   ),
-                                ),
-                              ],
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(3),
+                                    color:
+                                    _currentIndex == entry.key
+                                        ? Colors.pink
+                                        : Colors.grey,
+                                  ),
+                                );
+                              }).toList(),
                             ),
-                            SizedBox(
-                              height: 45,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: categories.length,
-                                itemBuilder: (context, index) {
-                                  bool isSelected = selectedIndex == index;
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedIndex = index;
-                                      });
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 10,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        gradient:
-                                            isSelected
-                                                ? const LinearGradient(
-                                                  colors: [
-                                                    Colors.pink,
-                                                    Colors.purple,
-                                                  ],
-                                                )
-                                                : null,
-                                        color:
-                                            isSelected
-                                                ? null
-                                                : Colors.grey[900],
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          categories[index],
-                                          style: TextStyle(
-                                            color:
-                                                isSelected
-                                                    ? Colors.white
-                                                    : Colors.grey,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            //   pages[selectedIndex],
                             SizedBox(height: 16),
+
+
                             GridView.builder(
                               itemCount: state.rooms.data?.length,
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 12,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 0.8,
-                                  ),
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 0.8,
+                              ),
                               itemBuilder: (context, index) {
                                 final rooms = state.rooms.data![index];
                                 return InkWell(
-                                  onTap: () {
+                                  onTap:(){
                                     navigateToRoom(rooms.sId!);
                                   },
                                   child: Stack(
@@ -349,11 +262,10 @@ class _HomePageState extends State<HomePage> {
                                               vertical: 4,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(
-                                                0.8,
+                                              color: Colors.white.withOpacity(0.8),
+                                              borderRadius: BorderRadius.circular(
+                                                20,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
                                             ),
                                             child: Row(
                                               children: [
@@ -364,9 +276,7 @@ class _HomePageState extends State<HomePage> {
                                                 SizedBox(width: 4),
                                                 Text(
                                                   "Live",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                  ),
+                                                  style: TextStyle(fontSize: 12),
                                                 ),
                                               ],
                                             ),
@@ -382,9 +292,7 @@ class _HomePageState extends State<HomePage> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(
-                                              0.6,
-                                            ),
+                                            color: Colors.black.withOpacity(0.6),
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
@@ -434,6 +342,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
+                      ),
                   ),
                 ],
               ),

@@ -4,12 +4,18 @@ import 'package:yoo_live/Core/network/DioClient.dart';
 import 'package:yoo_live/Features/data/Entity/UserEntity.dart';
 import 'package:yoo_live/Features/domain/DataSource/AuthDataSource.dart';
 import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
+import 'package:yoo_live/Features/domain/Model/JoinedCallResponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
+import 'package:yoo_live/Features/domain/Model/MuteMemberResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
+import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 
 import '../../domain/Model/CreatedLiveRoomReponse.dart';
 import '../../domain/Model/CreatingRoomResponse.dart';
+import '../../domain/Model/SliderResponse.dart';
+import '../../domain/Model/SwitchSeatResponse.dart';
 
 abstract class AuthDataRepository {
   Future<Either<Failure, UserEntity>> signInWithGoogle();
@@ -27,6 +33,13 @@ abstract class AuthDataRepository {
   Future<Either<Failure, CreatedLiveRoomResponse>> fetchListOfRooms();
   Future<Either<Failure, CreatingRoomResponse>> createRoom(DataForRoom dataForRoom);
   Future<Either<Failure, SingleRoomResponse>> fetchSingleRoom(String roomId);
+  Future<Either<Failure, ToJoinCallResponseModel>> joinCall(String roomId);
+  Future<Either<Failure, LeaveCallResponse>> leaveCall(String roomId);
+  Future<Either<Failure, SwitchSeatResponse>> switchSeat(String roomId,int seatNo);
+  Future<Either<Failure, MuteMemberResponse>> muteMember(String roomId, String userId, bool isMute);
+  Future<Either<Failure, JoinedCallReponseModel>> joinedCallResponse(String roomId, String status);
+  Future<Either<Failure, SliderResponse>> fetchSlider();
+
 
 }
 
@@ -108,5 +121,58 @@ class AuthDataRepositoryImpl extends AuthDataRepository {
       (data, success) => Right(data),
       (failure, statusCode) => Left(failure),
     );
+  }
+
+  @override
+  Future<Either<Failure, ToJoinCallResponseModel>> joinCall(String roomId) async{
+    final joinCallResponse = await authDataSource.joinCall(roomId);
+    return joinCallResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, JoinedCallReponseModel>> joinedCallResponse(String roomId, String status) async{
+    final joinedCallResponse = await authDataSource.joinedCallResponse(roomId, status);
+    return joinedCallResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, LeaveCallResponse>> leaveCall(String roomId) async{
+    final leaveCallResponse = await authDataSource.leaveCall(roomId);
+    return leaveCallResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, MuteMemberResponse>> muteMember(String roomId, String userId, bool isMute) async{
+    final muteMemberResponse = await authDataSource.muteMember(roomId, userId, isMute);
+    return muteMemberResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, SwitchSeatResponse>> switchSeat(String roomId,int seatNo) async{
+    final switchSeatResponse = await authDataSource.switchSeat(roomId, seatNo);
+    return switchSeatResponse.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    );
+  }
+
+  @override
+  Future<Either<Failure, SliderResponse>> fetchSlider() {
+    return authDataSource.fetchSlider().then((value) => value.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    ));
   }
 }

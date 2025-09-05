@@ -30,8 +30,8 @@ class Data {
   bool? seatLocked;
   int? callMemberCount;
   bool? private;
-  Null? password;
-  Null? profile;
+  String? password;
+  String? profile;
   String? sId;
   int? iV;
 

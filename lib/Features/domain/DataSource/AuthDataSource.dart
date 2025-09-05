@@ -12,9 +12,15 @@ import 'package:yoo_live/Features/domain/Model/AuthUserModelReponse.dart';
 import 'package:yoo_live/Features/domain/Model/CreatedLiveRoomReponse.dart';
 import 'package:yoo_live/Features/domain/Model/CreatingRoomResponse.dart';
 import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/JoinedCallResponseModel.dart';
+import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
+import 'package:yoo_live/Features/domain/Model/MuteMemberResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
+import 'package:yoo_live/Features/domain/Model/SliderResponse.dart';
+import 'package:yoo_live/Features/domain/Model/SwitchSeatResponse.dart';
+import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 import 'package:yoo_live/Features/domain/Model/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
@@ -37,6 +43,26 @@ abstract class AuthDataSource {
   Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom);
 
   Future<ApiResult<SingleRoomResponse>> fetchSingleRoom(String roomId);
+
+  Future<ApiResult<ToJoinCallResponseModel>> joinCall(String roomId);
+
+  Future<ApiResult<LeaveCallResponse>> leaveCall(String roomId);
+
+  Future<ApiResult<SwitchSeatResponse>> switchSeat(String roomId, int seatNo);
+
+  Future<ApiResult<MuteMemberResponse>> muteMember(
+    String roomId,
+    String userId,
+    bool isMute,
+  );
+
+  Future<ApiResult<JoinedCallReponseModel>> joinedCallResponse(
+    String roomId,
+    String status,
+  );
+
+  Future<ApiResult<SliderResponse>> fetchSlider();
+
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -152,7 +178,8 @@ class AuthDataSourceImpl extends AuthDataSource {
       options: Options(headers: {"Content-Type": "application/json"}),
       parser: (json) {
         print(json);
-        return AuthUserModelResponse.fromJson(json);},
+        return AuthUserModelResponse.fromJson(json);
+      },
     );
   }
 
@@ -262,6 +289,10 @@ class AuthDataSourceImpl extends AuthDataSource {
 
   @override
   Future<ApiResult<CreatedLiveRoomResponse>> fetchListOfRooms() {
+    final token = sharedPreferences.get(ApiConstants.accessTokenKey);
+
+    print(token);
+
     return _dioClient.apiResponseHandler(
       '/api/v1/rooms',
       method: 'GET',
@@ -270,14 +301,18 @@ class AuthDataSourceImpl extends AuthDataSource {
   }
 
   @override
-  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) {
+  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) async {
     final formData = FormData.fromMap({
       'title': dataForRoom.title,
       'category': dataForRoom.category,
       'seat': dataForRoom.seat,
-      'image':dataForRoom.imageFilePath
+      'image': dataForRoom.imageFilePath != null 
+          ? await MultipartFile.fromFile(
+              dataForRoom.imageFilePath!.path,
+              filename: dataForRoom.imageFilePath!.path.split('/').last,
+            )
+          : null,
     });
-
 
     return _dioClient.apiResponseHandler(
       '/api/v1/rooms',
@@ -289,10 +324,74 @@ class AuthDataSourceImpl extends AuthDataSource {
 
   @override
   Future<ApiResult<SingleRoomResponse>> fetchSingleRoom(String roomId) {
-      return _dioClient.apiResponseHandler(
-        '/api/v1/rooms/$roomId',
-        method: 'GET',
-        parser: (json) => SingleRoomResponse.fromJson(json),
-      );
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms/$roomId',
+      method: 'GET',
+      parser: (json) => SingleRoomResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<ToJoinCallResponseModel>> joinCall(String roomId) {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms/join/$roomId',
+      method: 'POST',
+      parser: (json) => ToJoinCallResponseModel.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<LeaveCallResponse>> leaveCall(String roomId) {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms/leave/$roomId',
+      method: 'PATCH',
+      parser: (json) => LeaveCallResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<SwitchSeatResponse>> switchSeat(String roomId, int seatNo) {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms/switch-seat/$roomId',
+      method: 'PATCH',
+      queryParameters: {'seatNo': seatNo},
+      parser: (json) => SwitchSeatResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<MuteMemberResponse>> muteMember(
+    String roomId,
+    String userId,
+    bool isMute,
+  ) {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms/mute-member/$roomId',
+      method: 'PATCH',
+      queryParameters: {'targetUserId': userId, 'mute': isMute},
+      parser: (json) => MuteMemberResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<JoinedCallReponseModel>> joinedCallResponse(
+    String roomId,
+    String status,
+  ) {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/rooms/members/$roomId',
+      method: 'GET',
+      queryParameters: {'status': status},
+      parser: (json) => JoinedCallReponseModel.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<SliderResponse>> fetchSlider() {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/sliders',
+      method: 'GET',
+      parser: (json) => SliderResponse.fromJson(json),
+    );
   }
 }
