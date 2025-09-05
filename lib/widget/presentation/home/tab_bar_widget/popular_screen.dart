@@ -2,313 +2,111 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class PopularScreen extends StatefulWidget {
+  const PopularScreen({super.key});
+
   @override
   State<PopularScreen> createState() => _PopularScreenState();
 }
 
 class _PopularScreenState extends State<PopularScreen> {
-  int _currentIndex = 0;
+  int selectedIndex = 0;
 
-  final List<Map<String, dynamic>> banners = [
-    {
-      "title": "Gaming Show",
-      "image": "assets/image/image 258120.png",
-      "viewers": "80.4k",
-      "isLive": true,
-    },
-    {
-      "title": "Music Night",
-      "image": "assets/image/image 258120.png",
-      "viewers": "80.4k",
-      "isLive": false,
-    },
-    {
-      "title": "Dance Party",
-      "image": "assets/image/image 258120.png",
-      "viewers": "80.4k",
-      "isLive": true,
-    },
+  final List<String> categories = [
+    "All",
+    "Popular",
+    "Following",
+    "Games",
+    "Shop",
   ];
-  final List<Map<String, dynamic>> liveUsers = [
-    {
-      "name": "Nasim iqbal",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Najin Nahar",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Najifa Nafis",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Najin Nahar",
-      "image": "assets/image/image 258120.png",
-      "views": 15,
-    },
-    {
-      "name": "Nasim iqbal",
-      "image": "assets/image/image 258120.png",
-      "views": 30,
-    },
-    {
-      "name": "Najin Nahar",
-      "image": "assets/image/image 258120.png",
-      "views": 41,
-    },
+
+  final List<Widget> pages = [
+    Center(child: Text("All Page", style: TextStyle(fontSize: 24))),
+    Center(child: Text("Popular Page", style: TextStyle(fontSize: 24))),
+    Center(child: Text("Following Page", style: TextStyle(fontSize: 24))),
+    Center(child: Text("Games Page", style: TextStyle(fontSize: 24))),
+    Center(child: Text("Shop Page", style: TextStyle(fontSize: 24))),
+  ];
+
+  final List<String> carouselImages = [
+    "https://picsum.photos/id/237/400/200",
+    "https://picsum.photos/id/238/400/200",
+    "https://picsum.photos/id/239/400/200",
+    "https://picsum.photos/id/240/400/200",
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Grid of Live Users
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    children: [
-                      CarouselSlider.builder(
-                        itemCount: banners.length,
-                        itemBuilder: (context, index, realIndex) {
-                          final banner = banners[index];
-                          return Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Image.asset(
-                                  banner["image"],
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                ),
-                              ),
-                              Positioned(
-                                left: 12,
-                                bottom: 12,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.remove_red_eye,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        banner["viewers"],
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      if (banner["isLive"])
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            "Live",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 12,
-                                top: 12,
-                                child: Text(
-                                  banner["title"],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black,
-                                        offset: Offset(1, 1),
-                                        blurRadius: 4,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                        options: CarouselOptions(
-                          height: 180,
-                          enlargeCenterPage: true,
-                          autoPlay: true,
-                          viewportFraction: 0.8,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Dots Indicator
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                            banners.asMap().entries.map((entry) {
-                              return Container(
-                                width: _currentIndex == entry.key ? 10.0 : 6.0,
-                                height: 6.0,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 3.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(3),
-                                  color:
-                                      _currentIndex == entry.key
-                                          ? Colors.pink
-                                          : Colors.grey,
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                      SizedBox(height: 16),
-                      GridView.builder(
-                        itemCount: liveUsers.length,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemBuilder: (context, index) {
-                          final user = liveUsers[index];
-                          return Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  user['image'],
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                left: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.wifi_tethering, size: 14),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "Live",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.remove_red_eye,
-                                        size: 14,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "${user['views']}",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 8,
-                                bottom: 8,
-                                child: Text(
-                                  user['name'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 2,
-                                        color: Colors.black,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+      appBar: AppBar(title: const Text("Yoo Live"), centerTitle: true),
+      body: Column(
+        children: [
+          // Carousel Slider
+          CarouselSlider(
+            items:
+                carouselImages.map((url) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  );
+                }).toList(),
+            options: CarouselOptions(
+              height: 180,
+              autoPlay: true,
+              enlargeCenterPage: true,
+              viewportFraction: 0.85,
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // Category Buttons
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                bool isSelected = selectedIndex == index;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.pink : Colors.grey[800],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Center(
+                      child: Text(
+                        categories[index],
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Selected Page Content
+          Expanded(child: pages[selectedIndex]),
+        ],
       ),
     );
   }
