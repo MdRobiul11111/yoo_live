@@ -74,23 +74,42 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: true,
       body: BlocListener<CreateRoomBloc, CreateRoomState>(
         listener: (context, state) {
           if (state is CreateRoomLoading) {
-            Center(child: CircularProgressIndicator());
+            print("Creating room - showing loading...");
+          } else if (state is AuthProfileDetails) {
+            role = state.authProfile.data?.role;
+            print("User role: $role");
           } else if (state is CreateRoomSuccess) {
             final roomId = state.creatingRoomResponse.data?.sId;
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId!)),
+            print("Room created successfully! RoomId: $roomId");
+            if (roomId != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AudioRoomPage(roomId: roomId),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Room created but ID is missing')),
+              );
+            }
+          } else if (state is CreateRoomFailure) {
+            print("Room creation failed: ${state.message}");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to create room: ${state.message}')),
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               //category
               const Text(
                 "Select Category",
@@ -139,7 +158,7 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
                     color: Colors.white24,
                     borderRadius: BorderRadius.circular(12),
                     image:
-                    selectedImagePath != null
+                        selectedImagePath != null
                             ? DecorationImage(
                               image: FileImage(selectedImagePath!),
                               fit: BoxFit.cover,
@@ -207,7 +226,7 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
                     }).toList(),
               ),
 
-              const Spacer(),
+              SizedBox(height: 40),
               Container(
                 width: double.infinity,
                 height: 55,
@@ -219,7 +238,9 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
                 ),
                 child: TextButton.icon(
                   onPressed: () {
-                    if (textEditingController.text.isNotEmpty && selectedImagePath != null) {
+                    if (textEditingController.text.isNotEmpty &&
+                        role == "ADMIN" &&
+                        selectedImagePath != null) {
                       DataForRoom dataForRoom = DataForRoom(
                         textEditingController.text,
                         selectedCategory.toUpperCase(),
@@ -241,7 +262,9 @@ class _BeforeLiveScreenState extends State<BeforeLiveScreen> {
                   ),
                 ),
               ),
-            ],
+              SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

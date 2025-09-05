@@ -18,6 +18,7 @@ import 'package:yoo_live/Features/domain/Model/MuteMemberResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
+import 'package:yoo_live/Features/domain/Model/SliderResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SwitchSeatResponse.dart';
 import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
@@ -59,6 +60,9 @@ abstract class AuthDataSource {
     String roomId,
     String status,
   );
+
+  Future<ApiResult<SliderResponse>> fetchSlider();
+
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -297,12 +301,17 @@ class AuthDataSourceImpl extends AuthDataSource {
   }
 
   @override
-  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) {
+  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) async {
     final formData = FormData.fromMap({
       'title': dataForRoom.title,
       'category': dataForRoom.category,
       'seat': dataForRoom.seat,
-      'image': dataForRoom.imageFilePath,
+      'image': dataForRoom.imageFilePath != null 
+          ? await MultipartFile.fromFile(
+              dataForRoom.imageFilePath!.path,
+              filename: dataForRoom.imageFilePath!.path.split('/').last,
+            )
+          : null,
     });
 
     return _dioClient.apiResponseHandler(
@@ -374,6 +383,15 @@ class AuthDataSourceImpl extends AuthDataSource {
       method: 'GET',
       queryParameters: {'status': status},
       parser: (json) => JoinedCallReponseModel.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<SliderResponse>> fetchSlider() {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/sliders',
+      method: 'GET',
+      parser: (json) => SliderResponse.fromJson(json),
     );
   }
 }

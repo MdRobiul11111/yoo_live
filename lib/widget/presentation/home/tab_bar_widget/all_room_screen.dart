@@ -18,7 +18,7 @@ class _AllRoomScreenState extends State<AllRoomScreen> {
     context.read<RoomBloc>().add(FetchSingleRoomDetailsEvent(roomId));
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AudioRoomPage()),
+      MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId,)),
     );
   }
 

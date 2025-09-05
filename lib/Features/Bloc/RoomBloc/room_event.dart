@@ -48,5 +48,26 @@ class JoinRoomEvent extends RoomEvent{
   List<Object?> get props => [roomId];
 }
 
+class JoinAgoraChannelEvent extends RoomEvent {
+  final String channelName;
+  final int uid;
+
+  const JoinAgoraChannelEvent(this.channelName, this.uid);
+}
+
+class LeaveAgoraChannelEvent extends RoomEvent {}
+
+class MuteLocalAudioEvent extends RoomEvent {
+  final bool mute;
+
+  const MuteLocalAudioEvent(this.mute);
+}
+
+class AgoraVolumeChanged extends RoomEvent {
+  final Map<int,int> volumes; // uid -> volume
+  const AgoraVolumeChanged(this.volumes);
+  @override
+  List<Object?> get props => [volumes];
+}
 
 

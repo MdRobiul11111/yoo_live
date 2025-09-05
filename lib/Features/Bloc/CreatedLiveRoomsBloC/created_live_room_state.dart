@@ -11,8 +11,9 @@ class CreatedLiveRoomInitial extends CreatedLiveRoomState {}
 class CreatedLiveRoomLoading extends CreatedLiveRoomState {}
 class CreatedLiveRoomLoaded extends CreatedLiveRoomState {
   final CreatedLiveRoomResponse rooms;
+  final SliderResponse sliderResponse;
 
-  const CreatedLiveRoomLoaded({required this.rooms});
+  const CreatedLiveRoomLoaded({required this.rooms,required this.sliderResponse});
   @override
   List<Object> get props => [rooms];
 }
@@ -23,4 +24,3 @@ class CreatedLiveRoomError extends CreatedLiveRoomState {
   @override
   List<Object> get props => [message];
 }
-

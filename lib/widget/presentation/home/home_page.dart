@@ -20,7 +20,13 @@ class _HomePageState extends State<HomePage> {
     context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
   }
 
-  void navigateToRoom(String roomId){
+  Future<void> _onRefresh() async {
+    context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
+    // Wait for the bloc to complete the fetch operation
+    await Future.delayed(Duration(milliseconds: 500));
+  }
+
+  void navigateToRoom(String roomId) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId,)),
@@ -84,21 +90,25 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   // Grid of Live Users
                   Expanded(
-                    child: SingleChildScrollView(
+                    child: RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      color: Colors.white,
+                      backgroundColor: Colors.pink,
+                      child: SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Column(
                           children: [
                             CarouselSlider.builder(
-                              itemCount: state.rooms.data?.length,
+                              itemCount: state.sliderResponse.data?.length,
                               itemBuilder: (context, index, realIndex) {
-                                final rooms = state.rooms.data?[index];
+                                final rooms = state.sliderResponse.data?[index];
                                 return Stack(
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: Image.network(
-                                        rooms?.profile ?? "",
+                                        rooms?.imageUrl ?? "",
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                       ),
@@ -124,26 +134,18 @@ class _HomePageState extends State<HomePage> {
                                               color: Colors.white,
                                               size: 16,
                                             ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              "${rooms?.callMemberCount ?? 0}",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                              ),
-                                            ),
                                             const SizedBox(width: 8),
-                                            if (rooms?.isActive??false)
+                                            if (rooms?.status=="ACTIVE")
                                               Container(
                                                 padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2,
-                                                    ),
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 2,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   color: Colors.red,
                                                   borderRadius:
-                                                      BorderRadius.circular(8),
+                                                  BorderRadius.circular(8),
                                                 ),
                                                 child: const Text(
                                                   "Live",
@@ -161,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                                       left: 12,
                                       top: 12,
                                       child: Text(
-                                       rooms?.title ?? "",
+                                        rooms?.title ?? "",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -198,25 +200,25 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children:
-                                  state.rooms.data!.asMap().entries.map((entry) {
-                                    return Container(
-                                      width:
-                                          _currentIndex == entry.key
-                                              ? 10.0
-                                              : 6.0,
-                                      height: 6.0,
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 3.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(3),
-                                        color:
-                                            _currentIndex == entry.key
-                                                ? Colors.pink
-                                                : Colors.grey,
-                                      ),
-                                    );
-                                  }).toList(),
+                              state.sliderResponse.data!.asMap().entries.map((entry) {
+                                return Container(
+                                  width:
+                                  _currentIndex == entry.key
+                                      ? 10.0
+                                      : 6.0,
+                                  height: 6.0,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 3.0,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(3),
+                                    color:
+                                    _currentIndex == entry.key
+                                        ? Colors.pink
+                                        : Colors.grey,
+                                  ),
+                                );
+                              }).toList(),
                             ),
                             SizedBox(height: 16),
 
@@ -226,12 +228,12 @@ class _HomePageState extends State<HomePage> {
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 12,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 0.8,
-                                  ),
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 0.8,
+                              ),
                               itemBuilder: (context, index) {
                                 final rooms = state.rooms.data![index];
                                 return InkWell(
@@ -243,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(12),
                                         child: Image.network(
-                                         rooms.profile ?? "",
+                                          rooms.profile ?? "",
                                           width: double.infinity,
                                           height: double.infinity,
                                           fit: BoxFit.cover,
@@ -319,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                                         left: 8,
                                         bottom: 8,
                                         child: Text(
-                                         rooms.title ?? "",
+                                          rooms.title ?? "",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -341,6 +343,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
+                      ),
                   ),
                 ],
               ),

@@ -14,6 +14,7 @@ import 'package:yoo_live/Features/domain/Model/TokenResponse.dart';
 
 import '../../domain/Model/CreatedLiveRoomReponse.dart';
 import '../../domain/Model/CreatingRoomResponse.dart';
+import '../../domain/Model/SliderResponse.dart';
 import '../../domain/Model/SwitchSeatResponse.dart';
 
 abstract class AuthDataRepository {
@@ -37,6 +38,7 @@ abstract class AuthDataRepository {
   Future<Either<Failure, SwitchSeatResponse>> switchSeat(String roomId,int seatNo);
   Future<Either<Failure, MuteMemberResponse>> muteMember(String roomId, String userId, bool isMute);
   Future<Either<Failure, JoinedCallReponseModel>> joinedCallResponse(String roomId, String status);
+  Future<Either<Failure, SliderResponse>> fetchSlider();
 
 
 }
@@ -164,5 +166,13 @@ class AuthDataRepositoryImpl extends AuthDataRepository {
       (data, success) => Right(data),
       (failure, statusCode) => Left(failure),
     );
+  }
+
+  @override
+  Future<Either<Failure, SliderResponse>> fetchSlider() {
+    return authDataSource.fetchSlider().then((value) => value.when(
+      (data, success) => Right(data),
+      (failure, statusCode) => Left(failure),
+    ));
   }
 }

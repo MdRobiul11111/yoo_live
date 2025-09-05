@@ -101,11 +101,9 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        //  backgroundColor: Colors.black,
-        body: _pages[_selectedIndex],
+    return Scaffold(
+      //  backgroundColor: Colors.black,
+      body: _pages[_selectedIndex],
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Colors.black,
@@ -151,7 +149,6 @@ class _RootPageState extends State<RootPage> {
             ],
           ),
         ),
-      ),
     );
   }
 }

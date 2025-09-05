@@ -21,4 +21,11 @@ class CreateRoomFailure extends CreateRoomState {
   List<Object?> get props => [message];
 }
 
+class AuthProfileDetails extends CreateRoomState{
+  final AuthProfile authProfile;
 
+  AuthProfileDetails(this.authProfile);
+
+  @override
+  List<Object?> get props => [authProfile];
+}
