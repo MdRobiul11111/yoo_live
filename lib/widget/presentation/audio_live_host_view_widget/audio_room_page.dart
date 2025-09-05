@@ -238,42 +238,53 @@ class AudioRoomPage extends StatelessWidget {
                           ],
                         ),
                         SizedBox(width: 8),
-                        Stack(
-                          children: [
-                            Container(
-                              height: 32,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Color(0xffB460D2),
-                              ),
-                              child: Row(
-                                children: [
-                                  Spacer(),
-                                  Text(
-                                    "15.5k",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
+                        InkWell(
+                          onTap: () {
+                            // // CoinsRankingScreen
+                            // showModalBottomSheet(
+                            //   context: context,
+                            //   builder: (BuildContext context) {
+                            //     return Container(child: CoinsRankingScreen());
+                            //   },
+                            // );
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                height: 32,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Color(0xffB460D2),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Spacer(),
+                                    Text(
+                                      "15.5k",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 12),
-                                ],
+                                    SizedBox(width: 12),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                vertical: 3.5,
-                                horizontal: 6,
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 3.5,
+                                  horizontal: 6,
+                                ),
+                                height: 25,
+                                width: 25,
+                                child: Image(
+                                  image: AssetImage("assets/icon/coin 1.png"),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                              height: 25,
-                              width: 25,
-                              child: Image(
-                                image: AssetImage("assets/icon/coin 1.png"),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Spacer(),
                         InkWell(

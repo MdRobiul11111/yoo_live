@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
 import 'package:yoo_live/Features/Bloc/RoomBloc/room_bloc.dart';
 import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
-import 'package:yoo_live/widget/presentation/notification_widget/notification_page.dart';
 
 import '../audio_live_host_view_widget/audio_room_page.dart';
 
@@ -71,10 +70,10 @@ class _HomePageState extends State<HomePage> {
             Spacer(),
             InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => NotificationPage()),
+                // );
               },
               child: Icon(Icons.notifications, color: Colors.white),
             ),
