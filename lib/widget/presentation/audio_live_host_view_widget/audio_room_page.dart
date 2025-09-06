@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/RoomBloc/room_bloc.dart';
@@ -7,10 +9,12 @@ import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_wi
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/user_room_profile_card.dart';
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
 
+import '../../../Constants/ApiConstants.dart';
+
 class AudioRoomPage extends StatefulWidget {
   final String roomId;
 
-  const AudioRoomPage({super.key, required this.roomId});
+  AudioRoomPage({super.key, required this.roomId});
 
   @override
   State<AudioRoomPage> createState() => _AudioRoomPageState();
@@ -18,6 +22,7 @@ class AudioRoomPage extends StatefulWidget {
 
 class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserver {
   final List<String> users = List.generate(16, (index) => "Seat ${index + 1}");
+
 
   @override
   void initState() {
@@ -77,6 +82,7 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
     return result ?? false;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -110,144 +116,260 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
           children: [
             // 🔼 Top Profile and follow
             Padding(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              child: Row(
-                children: [
-                  Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Color(0xff352C2E),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8, right: 15),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: AssetImage(
-                              "assets/image/image 258120.png",
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Spacer(),
-                              Text(
-                                "Addar Prohor",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                  padding: const EdgeInsets.only(left: 12, right: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: Color(0xff352C2E),
+                        ),
+                        child: BlocBuilder<RoomBloc, RoomState>(
+                          builder: (context, state) {
+                            if (state is RoomLoading) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 8,
+                                  right: 15,
                                 ),
+                                child: Row(
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(width: 8),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Spacer(),
+                                        Text(
+                                          "Loading...",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              ".....",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Icon(
+                                              Icons.equalizer,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                        Spacer(),
+                                      ],
+                                    ),
+                                    SizedBox(width: 10),
+                                    // follow button
+                                    CircleAvatar(
+                                      radius: 15,
+                                      backgroundColor: Color(0xffC358C6),
+                                      child: Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else if (state is RoomLoaded) {
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 8, right: 15),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        state.singleRoomResponse.data?.createdBy?.profileImage??"",
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Spacer(),
+                                        Text(
+                                          state.singleRoomResponse.data?.createdBy?.name??"",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "${state.singleRoomResponse.data?.createdBy?.userId??""}",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Icon(
+                                              Icons.equalizer,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                        Spacer(),
+                                      ],
+                                    ),
+                                    SizedBox(width: 10),
+                                    // follow button
+                                    CircleAvatar(
+                                      radius: 15,
+                                      backgroundColor: Color(0xffC358C6),
+                                      child: Icon(Icons.add, color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                left: 8,
+                                right: 15,
                               ),
-                              Row(
+                              child: Row(
                                 children: [
-                                  Text(
-                                    "ID:121511",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Spacer(),
+                                      Text(
+                                        "Loading...",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            ".....",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Icon(
+                                            Icons.equalizer,
+                                            color: Colors.white,
+                                          ),
+                                        ],
+                                      ),
+                                      Spacer(),
+                                    ],
+                                  ),
+                                  SizedBox(width: 10),
+                                  // follow button
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Color(0xffC358C6),
+                                    child: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.equalizer, color: Colors.white),
                                 ],
                               ),
-                              Spacer(),
+                            );
+                          },
+                        ),
+                      ),
+
+                      Spacer(),
+                      Row(
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 10,
+                                ),
+                                height: 25,
+                                width: 25,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      "assets/image/image 258120.png",
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                              ),
+                              // fream
+                              SizedBox(
+                                height: 45,
+                                width: 45,
+                                child: Image(
+                                  image: AssetImage("assets/icon/frem1.png"),
+                                ),
+                              ),
                             ],
                           ),
-                          SizedBox(width: 10),
-                          // follow button
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Color(0xffC358C6),
-                            child: Icon(Icons.add, color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
 
-                  Spacer(),
-                  Row(
-                    children: [
-                      Stack(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 10,
-                            ),
-                            height: 25,
-                            width: 25,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                  "assets/image/image 258120.png",
+                          Stack(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 10,
                                 ),
-                                fit: BoxFit.cover,
+                                height: 25,
+                                width: 25,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      "assets/image/image 258120.png",
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                              ), // fream
+                              SizedBox(
+                                height: 45,
+                                width: 45,
+                                child: Image(
+                                  image: AssetImage("assets/icon/frem1.png"),
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(40),
-                            ),
+                            ],
                           ),
-                          // fream
-                          SizedBox(
-                            height: 45,
-                            width: 45,
-                            child: Image(
-                              image: AssetImage("assets/icon/frem1.png"),
+                          Container(
+                            height: 25,
+                            width: 35,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey,
+                            ),
+                            child: Center(
+                              child: Text(
+                                "33+",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ],
-                      ),
-
-                      Stack(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 10,
-                            ),
-                            height: 25,
-                            width: 25,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                  "assets/image/image 258120.png",
-                                ),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                          ), // fream
-                          SizedBox(
-                            height: 45,
-                            width: 45,
-                            child: Image(
-                              image: AssetImage("assets/icon/frem1.png"),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        height: 25,
-                        width: 35,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey,
-                        ),
-                        child: Center(
-                          child: Text(
-                            "33+",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
@@ -407,23 +529,19 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                 }
                 if (state is RoomLoaded) {
                   final totalSeats = state.singleRoomResponse.data?.seat ?? 0;
-                  
-                  
-                  // Debug: Log all joined users and their IDs
-                  print("=== JOINED USERS DEBUG ===");
-                  for (var user in state.singleRoomResponse.data?.joinedMembers??<JoinedMembers>[]) {
-                    print("User: ${user.name}, UserID: ${user.userId}, SeatNo: ${user.seatNo}");
-                  }
-                  print("Volume Map: ${state.volumes}");
-                  print("========================");
-
-                  // Create a map for quick lookup
                   final seatMap = {
-                    for (var user in state.singleRoomResponse.data?.joinedMembers??<JoinedMembers>[]) user.seatNo: user,
+                    for (var user in state.singleRoomResponse.data?.joinedMembers??<JoinedMembers>[])
+                      user.seatNo: user,
                   };
 
                   return Expanded(
-                    child: GridView.builder(
+                    child: StreamBuilder<Map<int, int>>(
+                      stream: ApiConstants.volumeStream,
+                      builder: (context, volumeSnapshot) {
+                        final volumeMapData = volumeSnapshot.data ?? <int, int>{};
+                        print("StreamBuilder volume data: $volumeMapData");
+                        
+                        return GridView.builder(
                       padding: EdgeInsets.all(16),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
@@ -435,26 +553,14 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                       itemBuilder: (context, index) {
                         final seatNumber = index + 1;
                         final user = seatMap[seatNumber];
-                        final volumeMap = state.volumes;
-                        final uidToUserIdMap = state.agoraUidToUserIdMap;
-                        final userIdInt = user?.userId;
                         
-                        // Find which Agora UID corresponds to this user ID
-                        int? agoraUid;
-                        for (var entry in uidToUserIdMap.entries) {
-                          if (entry.value == userIdInt) {
-                            agoraUid = entry.key;
-                            break;
-                          }
-                        }
-                        
-                        // Use the mapped Agora UID to get volume
-                        final userVolume = agoraUid != null ? (volumeMap[agoraUid] ?? 0) : 0;
-                        final isTalking = userVolume > 1;
-                        
-                        // Enhanced debug logging
-                        if (user != null) {
-                          print("Debug - User: ${user.name}, UserID: $userIdInt, AgoraUID: $agoraUid, Volume: $userVolume, VolumeMap: $volumeMap, UIDMap: $uidToUserIdMap, IsTalking: $isTalking");
+
+                        bool isCurrentUserTalking = false;
+                        if (user?.userId != null && user!.userId is int) {
+                          final agoraUserid = user.userId as int;
+                          const int talkingThreshold = 5;
+                          final currentVolume = volumeMapData[agoraUserid] ?? 0;
+                          isCurrentUserTalking = currentVolume > talkingThreshold;
                         }
 
                         if (user != null) {
@@ -474,13 +580,21 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                                         );
                                       },
                                       child: Container(
-                                        padding: EdgeInsets.all(1),
+                                        padding: EdgeInsets.all(2),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: isTalking ? Colors.greenAccent : Colors.transparent,
+                                            color: isCurrentUserTalking ? Colors.greenAccent : Colors.transparent,
                                             width: 3,
                                           ),
+                                          // Add a subtle glow effect when talking
+                                          boxShadow: isCurrentUserTalking ? [
+                                            BoxShadow(
+                                              color: Colors.greenAccent.withOpacity(0.5),
+                                              blurRadius: 8,
+                                              spreadRadius: 2,
+                                            )
+                                          ] : null,
                                         ),
                                         child: CircleAvatar(
                                           backgroundImage: NetworkImage(
@@ -538,9 +652,11 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                               );
                             },
                           );
-                        } else {
-                          // Empty seat
+                        }
+                        else {
+                          // Empty seat - make it more subtle and consistent
                           return Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               InkWell(
                                 onTap: () {
@@ -551,30 +667,74 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                                     ),
                                   );
                                 },
-                                child: CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor: Colors.grey.shade700,
-                                  child: Icon(Icons.add, color: Colors.white),
+                                child: Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.transparent,
+                                    border: Border.all(
+                                      color: Colors.grey.withOpacity(0.3),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    color: Colors.grey.withOpacity(0.6),
+                                    size: 24,
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 4),
                               Text(
                                 "Seat $seatNumber",
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color: Colors.grey.withOpacity(0.7),
+                                  fontSize: 10,
+                                ),
                               ),
                             ],
                           );
                         }
                       },
+                        );
+                      },
                     ),
                   );
                 }
                 if (state is RoomError) {
-                  return Text(state.errorMessage);
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, color: Colors.red, size: 48),
+                        SizedBox(height: 8),
+                        Text(
+                          "Failed to load room",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        Text(
+                          state.errorMessage,
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
                 }
-                return Container(
-                   height: MediaQuery.of(context).size.height * 0.4,
-              width: double.infinity,
+                // Default state - show loading or empty state
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text(
+                        "Loading room...",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),),

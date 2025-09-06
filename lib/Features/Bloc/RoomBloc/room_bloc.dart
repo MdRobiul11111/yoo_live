@@ -22,10 +22,7 @@ part 'room_state.dart';
 class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final AuthDataRepository authDataRepository;
   final AgoraService agoraService;
-  StreamSubscription<Map<int,int>>? _volumeSub;
   RoomLoaded? _lastLoaded;
-  int? _currentUserAgoraUid;
-  int? _currentUserId;
 
   RoomBloc(this.authDataRepository, this.agoraService) : super(RoomInitial()) {
     on<FetchSingleRoomDetailsEvent>(_fetchSingleRoomDetails);
@@ -37,40 +34,18 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     on<LeaveAgoraChannelEvent>(_onLeaveAgoraChannel);
     on<MuteLocalAudioEvent>(_onMuteLocalAudio);
     on<AgoraVolumeChanged>(_onAgoraVolumeChanged);
-    // subscribe to the agora volume stream
-    _volumeSub = agoraService.volumeStream.listen((volumes) {
-      add(AgoraVolumeChanged(volumes));
-    });
+    
+    // // subscribe to the agora streams
+    // _volumeSub = agoraService.volumeStream.listen((volumes) {
+    //   add(AgoraVolumeChanged(volumes));
+    // });
   }
 
   Future<void> _onAgoraVolumeChanged(AgoraVolumeChanged event, Emitter<RoomState> emit) async {
-    print("RoomBloc - Volume changed: ${event.volumes}");
-    // If we have the last room loaded, re-emit it with updated volumes
-    if (_lastLoaded != null) {
-      // Build mapping from Agora UID to User ID
-      Map<int,int> uidToUserIdMap = {};
-      if (_currentUserId != null) {
-        // Map local Agora UID (0) to current user's actual ID
-        uidToUserIdMap[0] = _currentUserId!;
-      }
-      
-      _lastLoaded = RoomLoaded(
-        _lastLoaded!.singleRoomResponse,
-        volumes: event.volumes,
-        agoraUidToUserIdMap: uidToUserIdMap,
-      );
-      print("RoomBloc - Emitting RoomLoaded with volumes: ${event.volumes}, mapping: $uidToUserIdMap");
-      emit(_lastLoaded!);
-    } else {
-      print("RoomBloc - No lastLoaded state, volume update ignored");
-    }
+
+
   }
 
-  @override
-  Future<void> close() {
-    _volumeSub?.cancel();
-    return super.close();
-  }
 
   Future<void> _fetchSingleRoomDetails(
     FetchSingleRoomDetailsEvent event,
@@ -85,9 +60,8 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
         emit(RoomError(error.toString()));
       },
       (room) async {
-         _lastLoaded=RoomLoaded(room,volumes: const {}, agoraUidToUserIdMap: const {});
+         _lastLoaded=RoomLoaded(room);
           emit(_lastLoaded!);
-
       },
     );
   }
@@ -144,11 +118,9 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
         final roomId = joinRoom.data?.roomId;
         final userId = joinRoom.data?.userId;
-        
-        print("DEBUG - Joining Agora with roomId: $roomId, userId: $userId, userId type: ${userId.runtimeType}");
+
 
         if (roomId != null && roomId.isNotEmpty && userId != null) {
-          _currentUserId = userId;
           add(JoinAgoraChannelEvent(roomId, userId));
         } else {
           emit(RoomError("Invalid room or user ID received from server."));
@@ -163,7 +135,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   ) async {
     try {
       await agoraService.initialize();
-      await agoraService.joinChannel(event.channelName, event.uid);
+      await agoraService.joinChannel(event.channelName, event.uid); // correct user id is also passing
       emit(RoomAgoraJoined());
     } catch (e) {
       emit(RoomError("Failed to join Agora channel: $e"));

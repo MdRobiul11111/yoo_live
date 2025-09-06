@@ -5,8 +5,7 @@ import 'package:yoo_live/Constants/ApiConstants.dart';
 
 class AgoraService {
   late RtcEngine _engine;
-  final _volumeController = StreamController<Map<int, int>>.broadcast();
-  Stream<Map<int,int>> get volumeStream => _volumeController.stream;
+  int? localUserId;
 
   Future<void> initialize() async {
     _engine = createAgoraRtcEngine();
@@ -19,7 +18,7 @@ class AgoraService {
 
     // Enable audio volume indication
     await _engine.enableAudioVolumeIndication(
-      interval: 200, // 200ms interval
+      interval: 250, // 200ms interval
       smooth: 3,
       reportVad: true,
     );
@@ -28,36 +27,25 @@ class AgoraService {
     _engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (connection, elapsed) async {
-          print("Joined channel: ${connection.channelId}");
           await _engine.setEnableSpeakerphone(true);
-
+          localUserId = connection.localUid??0;
+          collectLocalId(connection.localUid??0);
         },
         onUserJoined: (connection, remoteUid, elapsed) {
-          print("User joined: $remoteUid");
         },
         onUserOffline: (connection, remoteUid, reason) {
-          print("User offline: $remoteUid");
+
         },
-        onAudioVolumeIndication:
-            (RtcConnection connection, List<AudioVolumeInfo> speakers, int speakerNumber, int totalVolume) {
-          print("Audio volume indication - Total: $totalVolume, Speakers: ${speakers.length}, SpeakerNumber: $speakerNumber");
-          // build a map uid -> volume for easy consumption
-          final map = <int,int>{};
+        onAudioVolumeIndication: (RtcConnection connection, List<AudioVolumeInfo> speakers, int speakerNumber, int totalVolume) {
           for (final s in speakers) {
-            final uid = s.uid ?? 0;
-            final volume = s.volume ?? 0;
-            map[uid] = volume;
-            print("Speaker - UID: $uid, Volume: $volume, VolumeType: ${s.vad}");
+            if (s.uid == 0 && localUserId != null && s.volume != null) {
+              ApiConstants.updateUserVolume(localUserId!, s.volume!);
+            } else if (s.uid != null && s.uid != 0 && s.volume != null) {
+              ApiConstants.updateUserVolume(s.uid!, s.volume!);
+            }
           }
-          
-          // Only add totalVolume if local user (uid 0) is actually in the speakers list
-          // Don't artificially add volume for local user when they're not speaking
-          
-          print("Volume map being sent: $map");
-          _volumeController.add(map);
         },
-        onLeaveChannel: (RtcConnection connection, RtcStats stats) {
-          print("Left channel: ${connection.channelId}");
+        onLeaveChannel: (RtcConnection connection, RtcStats stats) {print("Left channel: ${connection.channelId}");
         },
       ),
     );
@@ -86,5 +74,9 @@ class AgoraService {
 
   void dispose() {
     _engine.release();
+  }
+
+  int collectLocalId(int id){
+    return id;
   }
 }

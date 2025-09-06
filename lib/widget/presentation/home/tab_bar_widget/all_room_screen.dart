@@ -77,7 +77,7 @@ class _AllRoomScreenState extends State<AllRoomScreen> {
                                         ),
                                       ),
 
-                                      //I want to set a flag here is room isActive this container will show up otherwise not
+                                     
                                       if (rooms.isActive ?? false)
                                         Positioned(
                                           left: 8,
