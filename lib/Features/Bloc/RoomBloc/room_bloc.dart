@@ -161,9 +161,10 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   ) async {
     try {
       await agoraService.muteLocalAudio(event.mute);
-      emit(RoomAudioMuted(event.mute));
+      //emit(RoomAudioMuted(event.mute));
     } catch (e) {
-      emit(RoomError("Failed to mute/unmute: $e"));
+      print(e);
+      // emit(RoomError("Failed to mute/unmute: $e"));
     }
   }
   Future<void> _sendMessage(SendMessage event, Emitter<RoomState> emit) async{

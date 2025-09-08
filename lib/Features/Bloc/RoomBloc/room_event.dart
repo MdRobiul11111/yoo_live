@@ -70,9 +70,6 @@ class AgoraVolumeChanged extends RoomEvent {
   List<Object?> get props => [];
 }
 
-
-
-
 class SendMessage extends RoomEvent {
   final String roomId;
   final String message;

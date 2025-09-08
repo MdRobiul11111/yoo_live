@@ -68,6 +68,7 @@ class AgoraService {
     await _engine.leaveChannel();
   }
 
+  //this is for local user.
   Future<void> muteLocalAudio(bool mute) async {
     await _engine.muteLocalAudioStream(mute);
   }

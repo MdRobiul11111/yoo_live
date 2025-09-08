@@ -21,10 +21,12 @@ class AudioRoomPage extends StatefulWidget {
   State<AudioRoomPage> createState() => _AudioRoomPageState();
 }
 
-class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserver {
+class _AudioRoomPageState extends State<AudioRoomPage>
+    with WidgetsBindingObserver {
   final List<String> users = List.generate(16, (index) => "Seat ${index + 1}");
   int memberLength = 0;
   TextEditingController messageController = TextEditingController();
+  bool localAudioMute = false;
 
   @override
   void initState() {
@@ -104,7 +106,8 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
           } else if (state is RoomLoaded) {
             if (mounted) {
               setState(() {
-                memberLength = state.singleRoomResponse.data?.joinedMembers?.length ?? 0;
+                memberLength =
+                    state.singleRoomResponse.data?.joinedMembers?.length ?? 0;
               });
               print("Member length updated in BlocListener: $memberLength");
             }
@@ -206,7 +209,11 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                                       children: [
                                         Spacer(),
                                         Text(
-                                          state.singleRoomResponse.data?.title ?? "",
+                                          state
+                                                  .singleRoomResponse
+                                                  .data
+                                                  ?.title ??
+                                              "",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -215,7 +222,12 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                                         Row(
                                           children: [
                                             Text(
-                                              (state.singleRoomResponse.data?.sId ?? "").truncateTo(10),
+                                              (state
+                                                          .singleRoomResponse
+                                                          .data
+                                                          ?.sId ??
+                                                      "")
+                                                  .truncateTo(10),
                                               style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 12,
@@ -241,7 +253,6 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                                         color: Colors.white,
                                       ),
                                     ),
-
                                   ],
                                 ),
                               );
@@ -552,10 +563,12 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                         return StreamBuilder<Map<int, int>>(
                           stream: ApiConstants.volumeStream,
                           builder: (context, volumeSnapshot) {
-                            final volumeMapData = volumeSnapshot.data ?? <int, int>{};
+                            final volumeMapData =
+                                volumeSnapshot.data ?? <int, int>{};
                             return GridView.builder(
                               padding: EdgeInsets.all(16),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 4,
                                     mainAxisSpacing: 3,
                                     crossAxisSpacing: 16,
@@ -791,22 +804,28 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                     stream: ApiConstants.messages,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        final messages = snapshot.data!; // The data is a list of messages
+                        final messages =
+                            snapshot.data!; // The data is a list of messages
                         return ListView.builder(
-                          itemCount: messages.length, // Use the length of the list
+                          itemCount: messages.length,
+                          // Use the length of the list
                           itemBuilder: (context, index) {
                             final message = messages[index];
                             print(message.content);
-                            return ListItemWidget(name: message.name??"", message: message.content??"");
+                            return ListItemWidget(
+                              name: message.name ?? "",
+                              message: message.content ?? "",
+                            );
                           },
                         );
                       } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text('An error occurred!'),
-                        );
+                        return const Center(child: Text('An error occurred!'));
                       } else {
                         return const Center(
-                          child: Text('No messages yet.',style: TextStyle(color: Colors.white),),
+                          child: Text(
+                            'No messages yet.',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         );
                       }
                     },
@@ -841,16 +860,24 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                         icon: Icon(Icons.send, size: 32, color: Colors.white),
                         onPressed: () {
                           final message = messageController.text;
-                          context.read<RoomBloc>().add(SendMessage(widget.roomId,message));
+                          context.read<RoomBloc>().add(
+                            SendMessage(widget.roomId, message),
+                          );
                         },
                       ),
                       //mic
                       IconButton(
-                        icon: Icon(Icons.mic, size: 32, color: Colors.white),
+                        icon: Icon(localAudioMute ? Icons.mic_off : Icons.mic, size: 32, color: Colors.white),
                         onPressed: () {
-
+                         setState(() {
+                           localAudioMute = !localAudioMute;
+                           context.read<RoomBloc>().add(
+                             MuteLocalAudioEvent(localAudioMute),
+                           );
+                         });
                         },
                       ),
+
                       // InkWell(
                       //   onTap: () {},
                       //   child: Container(
@@ -862,7 +889,6 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                       //     ),
                       //   ),
                       // ),
-
                       InkWell(
                         onTap: () {},
                         child: Container(
@@ -926,16 +952,12 @@ extension StringTruncateExtension on String {
   }
 }
 
-
 class ListItemWidget extends StatelessWidget {
   final String name;
   final String message;
 
-  const ListItemWidget({
-    Key? key,
-    required this.name,
-    required this.message,
-  }) : super(key: key);
+  const ListItemWidget({Key? key, required this.name, required this.message})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -975,10 +997,7 @@ class ListItemWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 5),
-          Text(
-            "$name: $message",
-            style: const TextStyle(color: Colors.white),
-          ),
+          Text("$name: $message", style: const TextStyle(color: Colors.white)),
         ],
       ),
     );
