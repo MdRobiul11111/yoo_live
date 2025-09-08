@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
-import 'package:yoo_live/Features/Bloc/RoomBloc/room_bloc.dart';
 import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
 import 'package:yoo_live/widget/presentation/notification_widget/notification_page.dart';
 
@@ -15,7 +14,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-
+  final List<String> categories = [
+    'All',
+    'Popular',
+    'Following',
+    'Games',
+    'Shopping',
+    'News',
+    'Sports',
+    'Art',
+    'Music',
+  ];
+  int _selectedIndex = 0;
   void fetchLiveRooms() {
     context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
   }
@@ -31,6 +41,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateToRoom(String roomId) {
+    context.read<CreatedLiveRoomBloc>().add(JoinSocketRoomEvent(roomId));
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId,)),
@@ -40,6 +51,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    context.read<CreatedLiveRoomBloc>().add(ConnectSocketEvent());
     fetchLiveRooms();
     super.initState();
   }
@@ -154,7 +166,53 @@ class _HomePageState extends State<HomePage> {
                             );
                           }).toList(),
                         ),
-                        SizedBox(height: 16),
+                        SizedBox(height: 30),
+                        Text("Categories",style: TextStyle(color: Colors.white,fontSize: 20, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 10),
+
+                        SizedBox(height: 40,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (context,index){
+                            final isSelected = _selectedIndex == index;
+                            return GestureDetector(
+                              onTap: (){
+                                  setState(() {
+                                    _selectedIndex = index;
+                                  });
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 6),
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  // Apply a linear gradient if selected, otherwise a solid gray color
+                                  gradient: isSelected
+                                      ? const LinearGradient(
+                                    colors: [Color(0xFF8B47C5), Color(0xFFE44E6C)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                      : null,
+                                  color: isSelected ? null : Colors.white24, // Use white24 for an off-white gray
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  categories[index],
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.white : Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              ),
+                            );
+                          },
+                        ),
+                        ),
+
+                        SizedBox(height: 50,)
+
                       ]),
                     ),
                   ),

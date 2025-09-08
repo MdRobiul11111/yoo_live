@@ -62,7 +62,6 @@ abstract class AuthDataSource {
   );
 
   Future<ApiResult<SliderResponse>> fetchSlider();
-
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -119,6 +118,10 @@ class AuthDataSourceImpl extends AuthDataSource {
             ApiConstants.refreshTokenKey,
             data.data?.refreshToken ?? "",
           ),
+          sharedPreferences.setString(
+            ApiConstants.UserServerId,
+            data.data?.sId ?? "",
+          ),
         },
         (failure, statusCode) => {print(failure)},
       );
@@ -159,6 +162,11 @@ class AuthDataSourceImpl extends AuthDataSource {
           sharedPreferences.setString(
             ApiConstants.refreshTokenKey,
             data.data?.refreshToken ?? "",
+          ),
+
+          sharedPreferences.setString(
+            ApiConstants.UserServerId,
+            data.data?.sId ?? "",
           ),
         },
         (failure, statusCode) => {print(failure)},
@@ -301,17 +309,20 @@ class AuthDataSourceImpl extends AuthDataSource {
   }
 
   @override
-  Future<ApiResult<CreatingRoomResponse>> createRoom(DataForRoom dataForRoom) async {
+  Future<ApiResult<CreatingRoomResponse>> createRoom(
+    DataForRoom dataForRoom,
+  ) async {
     final formData = FormData.fromMap({
       'title': dataForRoom.title,
       'category': dataForRoom.category,
       'seat': dataForRoom.seat,
-      'image': dataForRoom.imageFilePath != null 
-          ? await MultipartFile.fromFile(
-              dataForRoom.imageFilePath!.path,
-              filename: dataForRoom.imageFilePath!.path.split('/').last,
-            )
-          : null,
+      'image':
+          dataForRoom.imageFilePath != null
+              ? await MultipartFile.fromFile(
+                dataForRoom.imageFilePath!.path,
+                filename: dataForRoom.imageFilePath!.path.split('/').last,
+              )
+              : null,
     });
 
     return _dioClient.apiResponseHandler(

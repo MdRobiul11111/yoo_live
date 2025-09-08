@@ -56,16 +56,6 @@ class JoiningRoomLoaded extends RoomState {
   List<Object?> get props => [toJoinCallResponseModel];
 }
 
-class JoiningRoomError extends RoomState {
-  final String errorMessage;
-
-  JoiningRoomError(this.errorMessage);
-
-  @override
-  List<Object?> get props => [errorMessage];
-}
-
-
 class RoomAgoraJoined extends RoomState {}
 
 class RoomAgoraLeft extends RoomState {}

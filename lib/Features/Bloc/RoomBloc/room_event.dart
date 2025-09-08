@@ -70,3 +70,17 @@ class AgoraVolumeChanged extends RoomEvent {
   List<Object?> get props => [];
 }
 
+
+
+
+class SendMessage extends RoomEvent {
+  final String roomId;
+  final String message;
+
+  const SendMessage(this.roomId,this.message,);
+
+  @override
+  List<Object?> get props => [roomId,message];
+}
+
+
