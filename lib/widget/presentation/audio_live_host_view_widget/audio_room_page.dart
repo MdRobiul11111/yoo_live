@@ -1,11 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/RoomBloc/room_bloc.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/call_request_widget/call_request_DefaultTab_button.dart';
-import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/coins_ranking_widget/coins_ranking_screen.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/room_tools_widget/tools_page.dart';
-import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/share_widget/share_screen.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/user_room_profile_card.dart';
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
 
@@ -21,6 +21,9 @@ class AudioRoomPage extends StatefulWidget {
 class _AudioRoomPageState extends State<AudioRoomPage>
     with WidgetsBindingObserver {
   final List<String> users = List.generate(16, (index) => "Seat ${index + 1}");
+  int memberLength = 0;
+  TextEditingController messageController = TextEditingController();
+  bool localAudioMute = false;
 
   @override
   void initState() {
@@ -98,6 +101,14 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                 content: Text("Error leaving room: ${state.errorMessage}"),
               ),
             );
+          } else if (state is RoomLoaded) {
+            if (mounted) {
+              setState(() {
+                memberLength =
+                    state.singleRoomResponse.data?.joinedMembers?.length ?? 0;
+              });
+              print("Member length updated in BlocListener: $memberLength");
+            }
           }
         },
         child: Scaffold(
@@ -290,65 +301,73 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                         ],
                       ),
                       SizedBox(width: 8),
-                      InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Container(child: CoinsRankingScreen());
-                            },
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              height: 32,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Color(0xffB460D2),
-                              ),
-                              child: Row(
-                                children: [
-                                  Spacer(),
-                                  Text(
-                                    "15.5k",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
+                      Stack(
+                        children: [
+                          Container(
+                            height: 32,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Color(0xffB460D2),
+                            ),
+                            child: Row(
+                              children: [
+                                Spacer(),
+                                Text(
+                                  "15.5k",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
                                   ),
-                                  SizedBox(width: 12),
-                                ],
-                              ),
+                                ),
+                                SizedBox(width: 12),
+                              ],
                             ),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                vertical: 3.5,
-                                horizontal: 6,
-                              ),
-                              height: 25,
-                              width: 25,
-                              child: Image(
-                                image: AssetImage("assets/icon/coin 1.png"),
-                                fit: BoxFit.cover,
-                              ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 3.5,
+                              horizontal: 6,
                             ),
-                          ],
-                        ),
+                            height: 25,
+                            width: 25,
+                            child: Image(
+                              image: AssetImage("assets/icon/coin 1.png"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
                       ),
                       Spacer(),
-                      InkWell(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.logout,
-                          color: Colors.white,
-                          size: 30,
+
+                      //leave call
+                      BlocListener<RoomBloc, RoomState>(
+                        listener: (context, state) {
+                          if (state is LeaveRoomError) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(state.errorMessage)),
+                            );
+                          } else if (state is LeaveRoomSuccess) {
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: InkWell(
+                          onTap: () {
+                            context.read<RoomBloc>().add(
+                              LeaveCallEvent(widget.roomId),
+                            );
+                          },
+                          child: Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
+
                 // 👑 Owner Section
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -786,15 +805,7 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                         onPressed: () {},
                       ),
                       InkWell(
-                        onTap: () {
-                          // ToolsPage
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return ShareScreen();
-                            },
-                          );
-                        },
+                        onTap: () {},
                         child: Container(
                           height: 25,
                           width: 25,
@@ -852,6 +863,69 @@ class _AudioRoomPageState extends State<AudioRoomPage>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+extension StringTruncateExtension on String {
+  String truncateTo(int maxLength, {String ellipsis = ""}) {
+    // Added optional ellipsis
+    if (length > maxLength) {
+      return substring(0, maxLength) + ellipsis;
+    } else {
+      return this;
+    }
+  }
+}
+
+class ListItemWidget extends StatelessWidget {
+  final String name;
+  final String message;
+
+  const ListItemWidget({Key? key, required this.name, required this.message})
+    : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12),
+      child: Row(
+        children: [
+          Stack(
+            children: [
+              Container(
+                height: 20,
+                width: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xffAA7E59),
+                ),
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      "9", // This value is still hardcoded
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(width: 12),
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(),
+                height: 23,
+                width: 23,
+                child: const Image(
+                  image: AssetImage("assets/icon/Frame 2147228166.png"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 5),
+          Text("$name: $message", style: const TextStyle(color: Colors.white)),
+        ],
       ),
     );
   }

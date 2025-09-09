@@ -18,6 +18,7 @@ import 'package:yoo_live/widget/presentation/splash_widget/splash_screen.dart';
 import 'Core/network/DioClient.dart';
 import 'Features/Bloc/SearchProfileBloc/search_profile_bloc.dart';
 import 'Features/domain/Service/AgoraService.dart';
+import 'Features/domain/Service/SocketService.dart';
 
 final sl = GetIt.instance;
 
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override 
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<AuthBloc>()),
@@ -73,6 +74,7 @@ void initDependency() async{
   sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(()=>DioClient(sl()));
   sl.registerLazySingleton(()=>AgoraService());
+  sl.registerLazySingleton(()=>SocketService());
   sl.registerLazySingleton<AuthDataSource>(()=>AuthDataSourceImpl(dioClient: sl(),sharedPreferences: sl()));
   sl.registerLazySingleton<LocalDataSource>(()=>LocalDataSourceImpl(sl()));
   sl<Dio>().interceptors.add(AuthInterceptor(sl(),sl(),sl()));
@@ -80,7 +82,7 @@ void initDependency() async{
   sl.registerLazySingleton(()=>AuthBloc(sl(),sl()));
   sl.registerLazySingleton(()=>AuthProfileBloc(sl()));
   sl.registerLazySingleton(()=>SearchProfileBloc(sl()));
-  sl.registerLazySingleton(()=>CreatedLiveRoomBloc(sl()));
+  sl.registerLazySingleton(()=>CreatedLiveRoomBloc(sl(),sl(),sl()));
   sl.registerLazySingleton(()=>CreateRoomBloc(sl()));
-  sl.registerLazySingleton(()=>RoomBloc(sl(),sl()));
+  sl.registerLazySingleton(()=>RoomBloc(sl(),sl(),sl(),sl()));
 }

@@ -2,12 +2,17 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 
+import '../../../widget/presentation/audio_live_host_view_widget/audio_room_page.dart';
 import '../../domain/Service/AgoraService.dart';
+import '../../domain/Service/SocketService.dart';
 
 part 'room_event.dart';
 part 'room_state.dart';
@@ -17,15 +22,18 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final AgoraService agoraService;
   StreamSubscription<Map<int, int>>? _volumeSub;
   RoomLoaded? _lastLoaded;
-  int? _currentUserAgoraUid;
-  int? _currentUserId;
+  SharedPreferences sharedPreferences;
 
-  RoomBloc(this.authDataRepository, this.agoraService) : super(RoomInitial()) {
+  RoomBloc(
+    this.authDataRepository,
+    this.agoraService,
+    this.socketService,
+    this.sharedPreferences,
+  ) : super(RoomInitial()) {
     on<FetchSingleRoomDetailsEvent>(_fetchSingleRoomDetails);
     on<SwitchSeatEvent>(_switchSeatResponseModel);
     on<LeaveCallEvent>(_leaveCallEvent);
     on<JoinRoomEvent>(_joinRoomEvent);
-
     on<JoinAgoraChannelEvent>(_onJoinAgoraChannel);
     on<LeaveAgoraChannelEvent>(_onLeaveAgoraChannel);
     on<MuteLocalAudioEvent>(_onMuteLocalAudio);
@@ -140,8 +148,16 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     final joinRoomResponse = await authDataRepository.joinCall(event.roomId);
     joinRoomResponse.fold(
       (error) {
+        String errorMessage;
+        if (error is ServerFailure) {
+          errorMessage = error.message;
+        } else if (error is NetworkFailure) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'An unknown error occurred.';
+        }
         print(error);
-        emit(JoiningRoomError(error.toString()));
+        emit(RoomError(errorMessage));
       },
       (joinRoom) {
         emit(JoiningRoomLoaded(joinRoom));
@@ -155,7 +171,6 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
         );
 
         if (roomId != null && roomId.isNotEmpty && userId != null) {
-          _currentUserId = userId;
           add(JoinAgoraChannelEvent(roomId, userId));
         } else {
           emit(RoomError("Invalid room or user ID received from server."));
@@ -170,7 +185,10 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   ) async {
     try {
       await agoraService.initialize();
-      await agoraService.joinChannel(event.channelName, event.uid);
+      await agoraService.joinChannel(
+        event.channelName,
+        event.uid,
+      ); // correct user id is also passing
       emit(RoomAgoraJoined());
     } catch (e) {
       emit(RoomError("Failed to join Agora channel: $e"));
@@ -196,9 +214,16 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   ) async {
     try {
       await agoraService.muteLocalAudio(event.mute);
-      emit(RoomAudioMuted(event.mute));
+      //emit(RoomAudioMuted(event.mute));
     } catch (e) {
-      emit(RoomError("Failed to mute/unmute: $e"));
+      print(e);
+      // emit(RoomError("Failed to mute/unmute: $e"));
     }
+  }
+
+  Future<void> _sendMessage(SendMessage event, Emitter<RoomState> emit) async {
+    final userId = sharedPreferences.getString(ApiConstants.UserServerId);
+    print("user id ; $userId");
+    socketService.sendMessage(event.roomId, event.message, userId ?? "");
   }
 }

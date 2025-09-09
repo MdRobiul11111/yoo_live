@@ -64,10 +64,20 @@ class MuteLocalAudioEvent extends RoomEvent {
 }
 
 class AgoraVolumeChanged extends RoomEvent {
-  final Map<int,int> volumes; // uid -> volume
-  const AgoraVolumeChanged(this.volumes);
+
+  const AgoraVolumeChanged();
   @override
-  List<Object?> get props => [volumes];
+  List<Object?> get props => [];
+}
+
+class SendMessage extends RoomEvent {
+  final String roomId;
+  final String message;
+
+  const SendMessage(this.roomId,this.message,);
+
+  @override
+  List<Object?> get props => [roomId,message];
 }
 
 

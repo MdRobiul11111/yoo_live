@@ -11,14 +11,11 @@ class RoomLoading extends RoomState {}
 
 class RoomLoaded extends RoomState {
   final SingleRoomResponse singleRoomResponse;
-  
-  final Map<int,int> volumes;
-  final Map<int,int> agoraUidToUserIdMap;
 
-  RoomLoaded(this.singleRoomResponse, {this.volumes = const {}, this.agoraUidToUserIdMap = const {}});
+  RoomLoaded(this.singleRoomResponse);
 
   @override
-  List<Object?> get props => [singleRoomResponse,volumes,agoraUidToUserIdMap];
+  List<Object?> get props => [singleRoomResponse];
 }
 
 class RoomError extends RoomState {
@@ -58,16 +55,6 @@ class JoiningRoomLoaded extends RoomState {
   @override
   List<Object?> get props => [toJoinCallResponseModel];
 }
-
-class JoiningRoomError extends RoomState {
-  final String errorMessage;
-
-  JoiningRoomError(this.errorMessage);
-
-  @override
-  List<Object?> get props => [errorMessage];
-}
-
 
 class RoomAgoraJoined extends RoomState {}
 

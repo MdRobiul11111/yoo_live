@@ -15,7 +15,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/image/wel.jpg"),
+            image: AssetImage("assets/image/dark.jpg"),
             fit: BoxFit.cover,
           ),
         ),

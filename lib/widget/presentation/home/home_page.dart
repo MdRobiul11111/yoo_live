@@ -14,18 +14,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-
+  final List<String> categories = [
+    'All',
+    'Popular',
+    'Following',
+    'Games',
+    'Shopping',
+    'News',
+    'Sports',
+    'Art',
+    'Music',
+  ];
+  int _selectedIndex = 0;
   void fetchLiveRooms() {
     context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
   }
 
   Future<void> _onRefresh() async {
-    context.read<CreatedLiveRoomBloc>().add(FetchCreatedLiveRooms());
+    final bloc = context.read<CreatedLiveRoomBloc>();
+    bloc.add(FetchCreatedLiveRooms());
+
     // Wait for the bloc to complete the fetch operation
-    await Future.delayed(Duration(milliseconds: 500));
+    await bloc.stream.firstWhere(
+      (state) =>
+          state is CreatedLiveRoomLoaded || state is CreatedLiveRoomError,
+    );
   }
 
   void navigateToRoom(String roomId) {
+    context.read<CreatedLiveRoomBloc>().add(JoinSocketRoomEvent(roomId));
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AudioRoomPage(roomId: roomId)),
@@ -34,6 +51,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    context.read<CreatedLiveRoomBloc>().add(ConnectSocketEvent());
     fetchLiveRooms();
     super.initState();
   }
