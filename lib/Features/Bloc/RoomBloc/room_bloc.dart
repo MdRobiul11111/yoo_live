@@ -1,28 +1,21 @@
 import 'dart:async';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
-import 'package:yoo_live/Features/domain/Model/JoinedCallResponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 
-import '../../../widget/presentation/audio_live_host_view_widget/audio_room_page.dart';
 import '../../domain/Service/AgoraService.dart';
 
 part 'room_event.dart';
-
 part 'room_state.dart';
 
 class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final AuthDataRepository authDataRepository;
   final AgoraService agoraService;
-  StreamSubscription<Map<int,int>>? _volumeSub;
+  StreamSubscription<Map<int, int>>? _volumeSub;
   RoomLoaded? _lastLoaded;
   int? _currentUserAgoraUid;
   int? _currentUserId;
@@ -43,23 +36,28 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     });
   }
 
-  Future<void> _onAgoraVolumeChanged(AgoraVolumeChanged event, Emitter<RoomState> emit) async {
+  Future<void> _onAgoraVolumeChanged(
+    AgoraVolumeChanged event,
+    Emitter<RoomState> emit,
+  ) async {
     print("RoomBloc - Volume changed: ${event.volumes}");
     // If we have the last room loaded, re-emit it with updated volumes
     if (_lastLoaded != null) {
       // Build mapping from Agora UID to User ID
-      Map<int,int> uidToUserIdMap = {};
+      Map<int, int> uidToUserIdMap = {};
       if (_currentUserId != null) {
         // Map local Agora UID (0) to current user's actual ID
         uidToUserIdMap[0] = _currentUserId!;
       }
-      
+
       _lastLoaded = RoomLoaded(
         _lastLoaded!.singleRoomResponse,
         volumes: event.volumes,
         agoraUidToUserIdMap: uidToUserIdMap,
       );
-      print("RoomBloc - Emitting RoomLoaded with volumes: ${event.volumes}, mapping: $uidToUserIdMap");
+      print(
+        "RoomBloc - Emitting RoomLoaded with volumes: ${event.volumes}, mapping: $uidToUserIdMap",
+      );
       emit(_lastLoaded!);
     } else {
       print("RoomBloc - No lastLoaded state, volume update ignored");
@@ -81,13 +79,16 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     final response = await authDataRepository.fetchSingleRoom(event.roomId);
 
     await response.fold(
-      (error)  async{
+      (error) async {
         emit(RoomError(error.toString()));
       },
       (room) async {
-         _lastLoaded=RoomLoaded(room,volumes: const {}, agoraUidToUserIdMap: const {});
-          emit(_lastLoaded!);
-
+        _lastLoaded = RoomLoaded(
+          room,
+          volumes: const {},
+          agoraUidToUserIdMap: const {},
+        );
+        emit(_lastLoaded!);
       },
     );
   }
@@ -102,12 +103,16 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       event.seatNo,
     );
     await switchSeatResponse.fold(
-            (error){
-              print(error);
-            },
-            (seat) async{
-             await _fetchSingleRoomDetails(FetchSingleRoomDetailsEvent(event.roomId), emit);
-            });
+      (error) {
+        print(error);
+      },
+      (seat) async {
+        await _fetchSingleRoomDetails(
+          FetchSingleRoomDetailsEvent(event.roomId),
+          emit,
+        );
+      },
+    );
   }
 
   Future<void> _leaveCallEvent(
@@ -144,8 +149,10 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
         final roomId = joinRoom.data?.roomId;
         final userId = joinRoom.data?.userId;
-        
-        print("DEBUG - Joining Agora with roomId: $roomId, userId: $userId, userId type: ${userId.runtimeType}");
+
+        print(
+          "DEBUG - Joining Agora with roomId: $roomId, userId: $userId, userId type: ${userId.runtimeType}",
+        );
 
         if (roomId != null && roomId.isNotEmpty && userId != null) {
           _currentUserId = userId;

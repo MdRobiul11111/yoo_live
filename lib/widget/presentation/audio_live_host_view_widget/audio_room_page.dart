@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yoo_live/Features/Bloc/RoomBloc/room_bloc.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/call_request_widget/call_request_DefaultTab_button.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/coins_ranking_widget/coins_ranking_screen.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/room_tools_widget/tools_page.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/share_widget/share_screen.dart';
 import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/user_room_profile_card.dart';
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
 
@@ -288,42 +290,52 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                         ],
                       ),
                       SizedBox(width: 8),
-                      Stack(
-                        children: [
-                          Container(
-                            height: 32,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Color(0xffB460D2),
-                            ),
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text(
-                                  "15.5k",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white,
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(child: CoinsRankingScreen());
+                            },
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: 32,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color(0xffB460D2),
+                              ),
+                              child: Row(
+                                children: [
+                                  Spacer(),
+                                  Text(
+                                    "15.5k",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 12),
-                              ],
+                                  SizedBox(width: 12),
+                                ],
+                              ),
                             ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              vertical: 3.5,
-                              horizontal: 6,
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                vertical: 3.5,
+                                horizontal: 6,
+                              ),
+                              height: 25,
+                              width: 25,
+                              child: Image(
+                                image: AssetImage("assets/icon/coin 1.png"),
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            height: 25,
-                            width: 25,
-                            child: Image(
-                              image: AssetImage("assets/icon/coin 1.png"),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Spacer(),
                       InkWell(
@@ -774,7 +786,15 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                         onPressed: () {},
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          // ToolsPage
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ShareScreen();
+                            },
+                          );
+                        },
                         child: Container(
                           height: 25,
                           width: 25,

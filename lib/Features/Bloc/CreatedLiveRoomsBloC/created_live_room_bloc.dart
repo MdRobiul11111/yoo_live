@@ -2,14 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/Model/CreatedLiveRoomReponse.dart';
 import 'package:yoo_live/Features/domain/Model/SliderResponse.dart';
-import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 
 part 'created_live_room_event.dart';
-
 part 'created_live_room_state.dart';
 
 class CreatedLiveRoomBloc
@@ -22,25 +19,28 @@ class CreatedLiveRoomBloc
   }
 
   FutureOr<void> _createdLiveRoomEvent(
-      CreatedLiveRoomEvent event,
-      Emitter<CreatedLiveRoomState> emit,
-      ) async {
+    CreatedLiveRoomEvent event,
+    Emitter<CreatedLiveRoomState> emit,
+  ) async {
     emit(CreatedLiveRoomLoading());
 
     final eitherSliderResponse = await authDataRepository.fetchSlider();
     await eitherSliderResponse.fold<Future<void>>(
-          (error) async {
+      (error) async {
         emit(CreatedLiveRoomError(message: error.toString()));
       },
-          (slider) async {
-        final eitherCreatedLiveRoomResponse = await authDataRepository.fetchListOfRooms();
+      (slider) async {
+        final eitherCreatedLiveRoomResponse =
+            await authDataRepository.fetchListOfRooms();
 
         eitherCreatedLiveRoomResponse.fold(
-              (roomError) {
+          (roomError) {
             emit(CreatedLiveRoomError(message: roomError.toString()));
           },
-              (liveRooms) {
-            emit(CreatedLiveRoomLoaded(rooms: liveRooms, sliderResponse: slider));
+          (liveRooms) {
+            emit(
+              CreatedLiveRoomLoaded(rooms: liveRooms, sliderResponse: slider),
+            );
           },
         );
       },

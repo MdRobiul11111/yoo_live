@@ -10,7 +10,7 @@ class CallRequestDefaulttabButton extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: Colors.black, // purple gradient bg
+        backgroundColor: Colors.black,
         body: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -19,7 +19,7 @@ class CallRequestDefaulttabButton extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
@@ -35,12 +35,12 @@ class CallRequestDefaulttabButton extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Spacer(),
+                      const Spacer(),
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(Icons.close, color: Colors.white),
+                        child: const Icon(Icons.close, color: Colors.white),
                       ),
                     ],
                   ),
@@ -53,12 +53,17 @@ class CallRequestDefaulttabButton extends StatelessWidget {
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: TabBar(
+                    //  BoxDecoration
                     indicator: BoxDecoration(
                       borderRadius: BorderRadius.circular(25),
                       gradient: const LinearGradient(
                         colors: [Color(0xFFD57C81), Color(0xFFC254D0)],
                       ),
                     ),
+
+                    indicatorColor: Colors.transparent,
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    dividerColor: Colors.transparent,
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.white70,
                     tabs: const [
@@ -69,7 +74,7 @@ class CallRequestDefaulttabButton extends StatelessWidget {
                 ),
 
                 // TabBar content
-                Expanded(
+                const Expanded(
                   child: TabBarView(
                     children: [CallRequestsScreen(), JoiningCallRequestPage()],
                   ),

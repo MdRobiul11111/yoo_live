@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ToolsPage extends StatelessWidget {
-  const ToolsPage({super.key});
+class ShareScreen extends StatelessWidget {
+  const ShareScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class ToolsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Tools",
+                  "Share",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -51,43 +51,43 @@ class ToolsPage extends StatelessWidget {
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (1).png",
-                    "Store",
+                    "assets/icon/whatsapp-icon-logo-svgrepo-com 1.png",
+                    "Whatsapp",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/exclusive 1 (1).png",
-                    "Backpack",
+                    "assets/icon/facebook-svgrepo-com 1.png",
+                    "Facebook",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (3).png",
-                    "Vip",
+                    "assets/icon/Simplification (10).png",
+                    "Imo",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (4).png",
-                    "Level",
+                    "assets/icon/link-svgrepo-com (1) 1.png",
+                    "Copy Link",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (5).png",
-                    "SVIP",
+                    "assets/icon/friend-3-svgrepo-com 1.png",
+                    "Friend",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (6).png",
-                    "Reseller",
+                    "assets/icon/more-vertical-svgrepo-com 2.png",
+                    "More",
                   ),
                 ),
               ],
