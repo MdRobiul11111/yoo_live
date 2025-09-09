@@ -22,7 +22,7 @@ import 'Features/domain/Service/SocketService.dart';
 
 final sl = GetIt.instance;
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initDependency();
   await Firebase.initializeApp();
