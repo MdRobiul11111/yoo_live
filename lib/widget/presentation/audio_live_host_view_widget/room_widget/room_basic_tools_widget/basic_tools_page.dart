@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_widget/room_basic_tools_widget/music_widget/play_music_screen.dart';
 
 class ToolsPage extends StatelessWidget {
   const ToolsPage({super.key});
@@ -9,10 +10,8 @@ class ToolsPage extends StatelessWidget {
       color: Colors.transparent,
       child: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF6A1B9A), Color(0xFF4A148C)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          gradient: const LinearGradient(
+            colors: [Color(0xFF3D263B), Color(0xFF724D70)],
           ),
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -25,7 +24,7 @@ class ToolsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Tools",
+                  "Basic Tools",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -49,47 +48,41 @@ class ToolsPage extends StatelessWidget {
               mainAxisSpacing: 16,
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Container(child: PlayMusicScreen());
+                      },
+                    );
+                  },
                   child: _buildToolItem(
-                    "assets/icon/Simplification (1).png",
-                    "Store",
+                    "assets/icon/Simplification (15).png",
+                    "Music",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/exclusive 1 (1).png",
-                    "Backpack",
+                    "assets/icon/Simplification (11).png",
+                    "Share",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (3).png",
-                    "Vip",
+                    "assets/icon/Simplification (12).png",
+                    "Emoji",
                   ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: _buildToolItem(
-                    "assets/icon/Simplification (4).png",
-                    "Level",
+                    "assets/icon/Simplification (16).png",
+                    "Seat Mode",
                   ),
                 ),
-                InkWell(
-                  onTap: () {},
-                  child: _buildToolItem(
-                    "assets/icon/Simplification (5).png",
-                    "SVIP",
-                  ),
-                ),
-                InkWell(
-                  onTap: () {},
-                  child: _buildToolItem(
-                    "assets/icon/Simplification (6).png",
-                    "Reseller",
-                  ),
-                ),
+                SizedBox(height: 20),
               ],
             ),
           ],
@@ -102,7 +95,7 @@ class ToolsPage extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(iconPath, width: 40, height: 40, fit: BoxFit.cover),
+        Image.asset(iconPath, width: 30, height: 30, fit: BoxFit.cover),
         const SizedBox(height: 6),
         Text(
           label,

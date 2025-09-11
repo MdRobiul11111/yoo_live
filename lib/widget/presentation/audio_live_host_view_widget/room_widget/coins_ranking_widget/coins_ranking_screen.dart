@@ -25,7 +25,7 @@ class _CoinsRankingScreenState extends State<CoinsRankingScreen>
         child: Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF4A148C), Color(0xFF4A148C)],
+              colors: [Color(0xFF3D263B), Color(0xFF724D70)],
             ),
             borderRadius: BorderRadius.circular(30),
           ),

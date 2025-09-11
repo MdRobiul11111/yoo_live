@@ -5,6 +5,7 @@ import 'package:yoo_live/widget/presentation/profile/followers_widget/followers_
 import 'package:yoo_live/widget/presentation/profile/followers_widget/following_page.dart';
 import 'package:yoo_live/widget/presentation/profile/setting_widget/setting_screen.dart';
 import 'package:yoo_live/widget/presentation/profile/store_widget/store_page.dart';
+import 'package:yoo_live/widget/presentation/profile/wallet_widget/wallet_screen.dart';
 
 import '../../../Features/Bloc/AuthProfileBloc/auth_profile_bloc.dart';
 
@@ -40,7 +41,18 @@ class _ProfilePageState extends State<ProfilePage> {
               _gridItem("assets/icon/Frame 2147228116.png", "Live history"),
               _gridItem("assets/icon/Frame 2147228116 (4).png", "Back Pack"),
               _gridItem("assets/icon/Frame 2147228116 (1).png", "My Level"),
-              _gridItem("assets/icon/Frame 2147228116 (3).png", "Wallet"),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => WalletScreen()),
+                  );
+                },
+                child: _gridItem(
+                  "assets/icon/Frame 2147228116 (3).png",
+                  "Wallet",
+                ),
+              ),
               _gridItem("assets/icon/Frame 2147228123.png", "Reseller"),
               _gridItem("assets/icon/Frame 2147228116 (2).png", "My Agency"),
               _gridItem("assets/icon/Frame 2147228116 (5).png", "Helping"),
