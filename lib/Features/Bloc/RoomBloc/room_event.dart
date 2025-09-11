@@ -80,4 +80,32 @@ class SendMessage extends RoomEvent {
   List<Object?> get props => [roomId,message];
 }
 
+class SocketUserJoinCallEvent extends RoomEvent {
+  final SocketUserJoinedCall socketUserJoinedCall;
+
+  const SocketUserJoinCallEvent(this.socketUserJoinedCall);
+
+  @override
+  List<Object?> get props => [socketUserJoinedCall];
+}
+
+
+class SockerUserLeaveCallEvent extends RoomEvent {
+  final SocketUserLeaveCall socketUserLeaveCall;
+
+  const SockerUserLeaveCallEvent(this.socketUserLeaveCall);
+
+  @override
+  List<Object?> get props => [socketUserLeaveCall];
+}
+
+class SocketSeatSwitchEvent extends RoomEvent{
+  final SocketUserSwitchSeat socketUserSwitchSeat;
+
+  const SocketSeatSwitchEvent(this.socketUserSwitchSeat);
+
+  @override
+  List<Object?> get props => [socketUserSwitchSeat];
+}
+
 

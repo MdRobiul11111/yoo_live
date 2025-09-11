@@ -28,8 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignInWithGoogleRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthStateLoading());
     final result = await authDataRepository.signInWithGoogle();
+    emit(AuthStateLoading());
     result.fold(
       (error) => emit(AuthError(error.toString())),
       (userModel) =>
@@ -51,8 +51,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   FutureOr<void> _onCheckUserSignedIn(CheckUserSignedIn event, Emitter<AuthState> emit) async{
-    emit(AuthStateLoading());
     final isSignedIn = await localDataSource.isUserSignedIn();
+    emit(AuthStateLoading());
     if(isSignedIn){
       emit(AuthStateSignIn("User is signed in"));
     }else{

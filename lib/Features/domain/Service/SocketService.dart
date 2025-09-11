@@ -2,6 +2,10 @@ import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:yoo_live/Constants/ApiConstants.dart';
 import 'package:yoo_live/Features/domain/Model/SocketMessageModel.dart';
+import 'package:yoo_live/Features/domain/Model/SocketUserJoinedCall.dart';
+
+import '../Model/SocketUserLeaveCall.dart';
+import '../Model/SocketUserSwitchSeat.dart';
 
 enum SocketConnectionStatus {
   disconnected,
@@ -19,6 +23,17 @@ class SocketService {
   SocketConnectionStatus get connectionStatus => _connectionStatus;
   bool get isConnected => _connectionStatus == SocketConnectionStatus.connected;
 
+  //SocketUserJoinCall
+  final StreamController<SocketUserJoinedCall> _userJoinedCallController = StreamController<SocketUserJoinedCall>.broadcast();
+  Stream<SocketUserJoinedCall> get userJoinedCallStream => _userJoinedCallController.stream;
+
+  //SocketUserLeaveCall
+  final StreamController<SocketUserLeaveCall> _userLeaveCallController = StreamController<SocketUserLeaveCall>.broadcast();
+  Stream<SocketUserLeaveCall> get userLeaveCallStream => _userLeaveCallController.stream;
+
+  //socketUserSwitchSeat
+  final StreamController<SocketUserSwitchSeat> _userSwitchSeatController = StreamController<SocketUserSwitchSeat>.broadcast();
+  Stream<SocketUserSwitchSeat> get userSwitchSeatStream => _userSwitchSeatController.stream;
 
 
   Future<void> connect() async {
@@ -70,10 +85,14 @@ class SocketService {
 
     _socket!.on('joined-call', (data) {
       print('joined-call event received: $data');
+      final joinedCall = SocketUserJoinedCall.fromJson(data);
+      _userJoinedCallController.add(joinedCall);
     });
 
     _socket!.on('left-call', (data){
       print('left-call event received: $data');
+      final leftCall = SocketUserLeaveCall.fromJson(data);
+      _userLeaveCallController.add(leftCall);
     });
 
     _socket!.on('new-room-message', (data) {
@@ -84,6 +103,12 @@ class SocketService {
     
     _socket!.on("room-message-sent", (data){
       print(data);
+    });
+
+    _socket!.on("seat-switched", (data){
+      print("switch seat event:  $data");
+      final seatSwitched = SocketUserSwitchSeat.fromJson(data);
+      _userSwitchSeatController.add(seatSwitched);
     });
 
   }

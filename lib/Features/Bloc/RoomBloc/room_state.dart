@@ -11,11 +11,17 @@ class RoomLoading extends RoomState {}
 
 class RoomLoaded extends RoomState {
   final SingleRoomResponse singleRoomResponse;
+  final String? currentUserId;
 
-  RoomLoaded(this.singleRoomResponse);
+
+  RoomLoaded(this.singleRoomResponse,this.currentUserId);
+
+  RoomLoaded copyWith({SingleRoomResponse? singleRoomResponse}) {
+    return RoomLoaded(singleRoomResponse ?? this.singleRoomResponse,currentUserId);
+  }
 
   @override
-  List<Object?> get props => [singleRoomResponse];
+  List<Object?> get props => [singleRoomResponse,currentUserId];
 }
 
 class RoomError extends RoomState {
@@ -71,3 +77,5 @@ class UserSpeakingState extends RoomState {
 
   UserSpeakingState(this.speakingUsers);
 }
+
+

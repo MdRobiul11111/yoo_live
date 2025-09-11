@@ -7,6 +7,9 @@ import 'package:yoo_live/Constants/ApiConstants.dart';
 import 'package:yoo_live/Features/data/Repository/AuthDataRepository.dart';
 import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
+import 'package:yoo_live/Features/domain/Model/SocketUserJoinedCall.dart';
+import 'package:yoo_live/Features/domain/Model/SocketUserLeaveCall.dart';
+import 'package:yoo_live/Features/domain/Model/SocketUserSwitchSeat.dart';
 import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
 
 import '../../../Core/Error/Failure.dart';
@@ -22,6 +25,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final SocketService socketService;
   RoomLoaded? _lastLoaded;
   SharedPreferences sharedPreferences;
+  StreamSubscription? streamSubscription;
 
   RoomBloc(this.authDataRepository, this.agoraService,this.socketService,this.sharedPreferences) : super(RoomInitial()) {
     on<FetchSingleRoomDetailsEvent>(_fetchSingleRoomDetails);
@@ -32,6 +36,23 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     on<LeaveAgoraChannelEvent>(_onLeaveAgoraChannel);
     on<MuteLocalAudioEvent>(_onMuteLocalAudio);
     on<SendMessage>(_sendMessage);
+    on<SocketUserJoinCallEvent>(_onSocketUserJoinedCall);
+    on<SockerUserLeaveCallEvent>(_onSocketUserLeaveCall);
+    on<SocketSeatSwitchEvent>(_socketSeatSwitchEvent);
+
+
+    streamSubscription = socketService.userJoinedCallStream.listen((user){
+      add(SocketUserJoinCallEvent(user));
+    });
+
+    streamSubscription = socketService.userLeaveCallStream.listen((user){
+      add(SockerUserLeaveCallEvent(user));
+    });
+
+    streamSubscription = socketService.userSwitchSeatStream.listen((user){
+      add(SocketSeatSwitchEvent(user));
+    });
+
   }
 
   Future<void> _fetchSingleRoomDetails(
@@ -47,7 +68,8 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
         emit(RoomError(error.toString()));
       },
           (room) async {
-        _lastLoaded=RoomLoaded(room);
+            final userId = sharedPreferences.getString(ApiConstants.UserServerId);
+        _lastLoaded=RoomLoaded(room,userId);
         emit(_lastLoaded!);
       },
     );
@@ -57,7 +79,6 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       SwitchSeatEvent event,
       Emitter<RoomState> emit,
       ) async {
-    emit(RoomLoading());
     final switchSeatResponse = await authDataRepository.switchSeat(
       event.roomId,
       event.seatNo,
@@ -67,7 +88,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
           print(error);
         },
             (seat) async{
-          await _fetchSingleRoomDetails(FetchSingleRoomDetailsEvent(event.roomId), emit);
+
         });
   }
 
@@ -164,5 +185,69 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     final userId = sharedPreferences.getString(ApiConstants.UserServerId);
     print("user id ; $userId");
     socketService.sendMessage(event.roomId, event.message, userId??"");
+  }
+
+  void _onSocketUserJoinedCall(SocketUserJoinCallEvent event, Emitter<RoomState> emit) {
+    if(state is RoomLoaded){
+      final currentState = state as RoomLoaded;
+      final currentMembers = currentState.singleRoomResponse.data!.joinedMembers!;
+
+      final isMemberAlreadyPresent = currentMembers.any((member) => member.sId == event.socketUserJoinedCall.id);
+      if (isMemberAlreadyPresent) return;
+
+      final newJoinedMember = JoinedMembers(
+        sId: event.socketUserJoinedCall.id,
+        userId: event.socketUserJoinedCall.userId,
+        role: event.socketUserJoinedCall.role,
+        seatNo: event.socketUserJoinedCall.seatNo,
+        status: event.socketUserJoinedCall.status,
+        name: event.socketUserJoinedCall.name,
+        profileImage: event.socketUserJoinedCall.profileImage,
+        callLeftAt: null,
+      );
+      final updatedMembers = List<JoinedMembers>.from(currentMembers)..add(newJoinedMember);
+      final updateData = currentState.singleRoomResponse.data!.copyWith(joinedMembers: updatedMembers,callMemberCount: updatedMembers.length);
+      final updatedSingleRoomResponse = currentState.singleRoomResponse.copyWith(data: updateData);
+      emit(RoomLoaded(updatedSingleRoomResponse,event.socketUserJoinedCall.id));
+    }
+  }
+
+  void _onSocketUserLeaveCall(SockerUserLeaveCallEvent event, Emitter<RoomState> emit) {
+    if(state is RoomLoaded){
+      final currentState = state as RoomLoaded;
+      final currentMembers = currentState.singleRoomResponse.data!.joinedMembers!;
+      final updatedMembers = currentMembers.where(
+            (member) => member.sId != event.socketUserLeaveCall.id,
+      ).toList();
+
+      final updatedData = currentState.singleRoomResponse.data!.copyWith(
+        joinedMembers: updatedMembers,
+        callMemberCount: updatedMembers.length,
+      );
+      final updatedSingleRoomResponse = currentState.singleRoomResponse.copyWith(data: updatedData);
+
+      emit(RoomLoaded(updatedSingleRoomResponse,event.socketUserLeaveCall.id));
+    }
+  }
+
+    void _socketSeatSwitchEvent(SocketSeatSwitchEvent event, Emitter<RoomState> emit) {
+      if (state is RoomLoaded) {
+        final currentState = state as RoomLoaded;
+        final currentMembers = currentState.singleRoomResponse.data!.joinedMembers!;
+        final updatedMembers = currentMembers.map((member) {
+          if (member.userId == event.socketUserSwitchSeat.userId) {
+            return member.copyWith(seatNo: event.socketUserSwitchSeat.seatNo);
+          }
+          return member;
+        }).toList();
+        if (updatedMembers.length == currentMembers.length) {
+          final updatedData = currentState.singleRoomResponse.data!.copyWith(
+            joinedMembers: updatedMembers,
+          );
+          final updatedSingleRoomResponse = currentState.singleRoomResponse.copyWith(data: updatedData);
+          print("id from bloc : ${event.socketUserSwitchSeat.id}");
+          emit(RoomLoaded(updatedSingleRoomResponse,event.socketUserSwitchSeat.id));
+        }
+      }
   }
 }

@@ -17,6 +17,17 @@ class SingleRoomResponse {
     }
     return data;
   }
+
+  SingleRoomResponse copyWith({
+    String? message,
+    Data? data,
+  }) {
+    return SingleRoomResponse(
+      message: message ?? this.message,
+      data: data ?? this.data,
+    );
+  }
+
 }
 
 class Data {
@@ -86,6 +97,35 @@ class Data {
     }
     return data;
   }
+
+  Data copyWith({
+    String? sId,
+    String? title,
+    bool? isActive,
+    String? category,
+    int? seat,
+    bool? seatLocked,
+    int? callMemberCount,
+    bool? private,
+    String? profile,
+    CreatedBy? createdBy, // If CreatedBy is complex, you might need a way to update it deeply
+    List<JoinedMembers>? joinedMembers, // Same for List<JoinedMembers>
+  }) {
+    return Data(
+      sId: sId ?? this.sId,
+      title: title ?? this.title,
+      isActive: isActive ?? this.isActive,
+      category: category ?? this.category,
+      seat: seat ?? this.seat,
+      seatLocked: seatLocked ?? this.seatLocked,
+      callMemberCount: callMemberCount ?? this.callMemberCount,
+      private: private ?? this.private,
+      profile: profile ?? this.profile,
+      createdBy: createdBy ?? this.createdBy,
+      joinedMembers: joinedMembers ?? this.joinedMembers,
+    );
+  }
+
 }
 
 class CreatedBy {
@@ -110,6 +150,20 @@ class CreatedBy {
     data['name'] = this.name;
     data['profileImage'] = this.profileImage;
     return data;
+  }
+
+  CreatedBy copyWith({
+    String? sId,
+    int? userId,
+    String? name,
+    String? profileImage,
+  }) {
+    return CreatedBy(
+      sId: sId ?? this.sId,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      profileImage: profileImage ?? this.profileImage,
+    );
   }
 }
 
@@ -155,5 +209,28 @@ class JoinedMembers {
     data['name'] = this.name;
     data['profileImage'] = this.profileImage;
     return data;
+  }
+
+
+  JoinedMembers copyWith({
+    String? sId,
+    int? userId,
+    String? role,
+    int? seatNo,
+    String? callLeftAt,
+    String? status,
+    String? name,
+    String? profileImage,
+  }) {
+    return JoinedMembers(
+      sId: sId ?? this.sId,
+      userId: userId ?? this.userId,
+      role: role ?? this.role,
+      seatNo: seatNo ?? this.seatNo,
+      callLeftAt: callLeftAt ?? this.callLeftAt,
+      status: status ?? this.status,
+      name: name ?? this.name,
+      profileImage: profileImage ?? this.profileImage,
+    );
   }
 }

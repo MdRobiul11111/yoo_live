@@ -21,8 +21,7 @@ class AudioRoomPage extends StatefulWidget {
   State<AudioRoomPage> createState() => _AudioRoomPageState();
 }
 
-class _AudioRoomPageState extends State<AudioRoomPage>
-    with WidgetsBindingObserver {
+class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserver {
   final List<String> users = List.generate(16, (index) => "Seat ${index + 1}");
   int memberLength = 0;
   TextEditingController messageController = TextEditingController();
@@ -92,12 +91,10 @@ class _AudioRoomPageState extends State<AudioRoomPage>
       child: BlocListener<RoomBloc, RoomState>(
         listener: (context, state) {
           if (state is LeaveRoomSuccess) {
-            print("Leave room success - navigating back to RootPage");
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => RootPage()),
             );
           } else if (state is LeaveRoomError) {
-            print("Leave room error: ${state.errorMessage}");
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text("Error leaving room: ${state.errorMessage}"),
@@ -106,10 +103,8 @@ class _AudioRoomPageState extends State<AudioRoomPage>
           } else if (state is RoomLoaded) {
             if (mounted) {
               setState(() {
-                memberLength =
-                    state.singleRoomResponse.data?.joinedMembers?.length ?? 0;
+                memberLength = state.singleRoomResponse.data?.joinedMembers?.length ?? 0;
               });
-              print("Member length updated in BlocListener: $memberLength");
             }
           }
         },
@@ -209,11 +204,7 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                                       children: [
                                         Spacer(),
                                         Text(
-                                          state
-                                              .singleRoomResponse
-                                              .data
-                                              ?.title ??
-                                              "",
+                                          state.singleRoomResponse.data?.createdBy?.name ??"",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -222,12 +213,7 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                                         Row(
                                           children: [
                                             Text(
-                                              (state
-                                                  .singleRoomResponse
-                                                  .data
-                                                  ?.sId ??
-                                                  "")
-                                                  .truncateTo(10),
+                                              "${state.singleRoomResponse.data?.createdBy?.userId ?? 0}",
                                               style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 12,
@@ -502,49 +488,8 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                   ),
                 ),
 
-                // 👑 Owner Section
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Stack(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 11,
-                          horizontal: 10,
-                        ),
-                        height: 55,
-                        width: 55,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/image/image 258120.png"),
-                            fit: BoxFit.fill,
-                          ),
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                      ), // fream
-                      SizedBox(
-                        height: 80,
-                        width: 80,
-                        child: Image(
-                          image: AssetImage("assets/icon/frem1.png"),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  "Owner",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                //🎤 Grid of Seats
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  decoration: BoxDecoration(color: Colors.transparent),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   child: BlocBuilder<RoomBloc, RoomState>(
                     builder: (context, state) {
@@ -553,192 +498,67 @@ class _AudioRoomPageState extends State<AudioRoomPage>
                       }
                       if (state is RoomLoaded) {
                         final totalSeats = state.singleRoomResponse.data?.seat ?? 0;
-
                         final seatMap = {
                           for (var user in state.singleRoomResponse.data?.joinedMembers ?? <JoinedMembers>[])
                             user.seatNo: user,
                         };
+                        final userAtSeat0 = seatMap[0];
                         return StreamBuilder<Map<int, int>>(
                           stream: ApiConstants.volumeStream,
                           builder: (context, volumeSnapshot) {
                             final volumeMapData = volumeSnapshot.data ?? <int, int>{};
-                            return GridView.builder(
-                              padding: EdgeInsets.all(16),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                mainAxisSpacing: 3,
-                                crossAxisSpacing: 16,
-                                childAspectRatio: 0.85,
-                              ),
-                              itemCount: totalSeats,
-                              itemBuilder: (context, index) {
-                                final seatNumber = index + 1;
-                                final user = seatMap[seatNumber];
-                                bool isCurrentUserTalking = false;
-
-                                if (user?.userId != null && user!.userId is int) {
-                                  final agoraUserid = user.userId as int;
-                                  const int talkingThreshold = 5;
-                                  final currentVolume = volumeMapData[agoraUserid] ?? 0;
-                                  isCurrentUserTalking = currentVolume > talkingThreshold;
-                                }
-
-                                if (user != null) {
-                                  // Seat occupied by a user
-                                  return LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      return Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Flexible(
-                                            flex: 7,
-                                            child: InkWell(
-                                              onTap: () {
-                                                showModalBottomSheet(
-                                                  context: context,
-                                                  builder:
-                                                      (
-                                                      _,
-                                                      ) => UserRoomProfileCard(
-                                                    uid: "${user.userId}",
-                                                  ),
-                                                );
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.all(2),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color:
-                                                    isCurrentUserTalking
-                                                        ? Colors.greenAccent
-                                                        : Colors
-                                                        .transparent,
-                                                    width: 3,
-                                                  ),
-                                                  // Add a subtle glow effect when talking
-                                                  boxShadow:
-                                                  isCurrentUserTalking
-                                                      ? [
-                                                    BoxShadow(
-                                                      color: Colors
-                                                          .greenAccent
-                                                          .withOpacity(
-                                                        0.5,
-                                                      ),
-                                                      blurRadius: 8,
-                                                      spreadRadius: 2,
-                                                    ),
-                                                  ]
-                                                      : null,
-                                                ),
-                                                child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                    user.profileImage ?? "",
-                                                  ),
-                                                  radius: 20,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Flexible(
-                                            flex: 3,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                              children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    user.name ?? "",
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10,
-                                                    ),
-                                                    overflow:
-                                                    TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                ),
-                                                Flexible(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
-                                                    mainAxisSize:
-                                                    MainAxisSize.min,
-                                                    children: [
-                                                      SizedBox(
-                                                        height: 10,
-                                                        width: 10,
-                                                        child: Image.asset(
-                                                          "assets/icon/diamond 1.png",
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 1),
-                                                      Text(
-                                                        "15.5k",
-                                                        style: TextStyle(
-                                                          color: Colors.amber,
-                                                          fontSize: 9,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  // Empty seat - make it more subtle and consistent
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
+                            bool isOwnerTalking = false;
+                            if (userAtSeat0?.userId != null && userAtSeat0!.userId is int) {
+                              final agoraUserid = userAtSeat0.userId as int;
+                              const int talkingThreshold = 5;
+                              final currentVolume = volumeMapData[agoraUserid] ?? 0;
+                              isOwnerTalking = currentVolume > talkingThreshold;
+                            }
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      InkWell(
-                                        onTap: () {
-                                          context.read<RoomBloc>().add(
-                                            SwitchSeatEvent(
-                                              widget.roomId,
-                                              seatNumber,
-                                            ),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: 50,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.transparent,
-                                            border: Border.all(
-                                              color: Colors.grey.withOpacity(
-                                                0.3,
-                                              ),
-                                              width: 2,
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            Icons.add,
-                                            color: Colors.grey.withOpacity(0.6),
-                                            size: 24,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Seat $seatNumber",
-                                        style: TextStyle(
-                                          color: Colors.grey.withOpacity(0.7),
-                                          fontSize: 10,
-                                        ),
-                                      ),
+                                      _buildOwnerSeat(context, userAtSeat0, isOwnerTalking),
                                     ],
-                                  );
-                                }
-                              },
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GridView.builder(
+                                    padding: EdgeInsets.all(16),
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4,
+                                      mainAxisSpacing: 3,
+                                      crossAxisSpacing: 16,
+                                      childAspectRatio: 0.85,
+                                    ),
+                                    itemCount: totalSeats - 1, // Exclude the first seat
+                                    itemBuilder: (context, index) {
+                                      final seatNumber = index + 1; // Start seat numbering from 1
+                                      final user = seatMap[seatNumber];
+                                      bool isUserTalking = false;
+
+                                      if (user?.userId != null && user!.userId is int) {
+                                        final agoraUserid = user.userId as int;
+                                        const int talkingThreshold = 5;
+                                        final currentVolume = volumeMapData[agoraUserid] ?? 0;
+                                        isUserTalking = currentVolume > talkingThreshold;
+                                      }
+
+                                      if (user != null) {
+                                        return _buildOccupiedSeat(context, user, isUserTalking);
+                                      } else {
+                                        final adminId = state.singleRoomResponse.data?.createdBy?.sId??"";
+                                        final userId = state.currentUserId??"";
+
+                                        return _buildEmptySeat(context, seatNumber, widget.roomId,userId,adminId);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
                             );
                           },
                         );
@@ -932,17 +752,6 @@ class _AudioRoomPageState extends State<AudioRoomPage>
   }
 }
 
-extension StringTruncateExtension on String {
-  String truncateTo(int maxLength, {String ellipsis = ""}) {
-    // Added optional ellipsis
-    if (length > maxLength) {
-      return substring(0, maxLength) + ellipsis;
-    } else {
-      return this;
-    }
-  }
-}
-
 class ListItemWidget extends StatelessWidget {
   final String name;
   final String message;
@@ -994,3 +803,412 @@ class ListItemWidget extends StatelessWidget {
     );
   }
 }
+
+Widget _buildOwnerSeat(BuildContext context, JoinedMembers? user, bool isTalking) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      InkWell(
+        onTap: () {
+          if (user != null) {
+            showModalBottomSheet(
+              context: context,
+              builder: (_) => UserRoomProfileCard(uid: "${user.userId}"),
+            );
+          }
+        },
+        child: user != null ?
+        Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isTalking ? Colors.greenAccent : Colors.transparent,
+              width: 3,
+            ),
+            boxShadow: isTalking ? [BoxShadow(
+                color: Colors.greenAccent.withOpacity(0.5),
+                blurRadius: 8,
+                spreadRadius: 2,
+              ),
+            ]: null,
+          ),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(user.profileImage ?? ""),
+            radius: 20,
+          ),
+        ) :
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Stack(
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: 11,
+                  horizontal: 10,
+                ),
+                height: 55,
+                width: 55,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/image/image 258120.png"),
+                    fit: BoxFit.fill,
+                  ),
+                  borderRadius: BorderRadius.circular(40),
+                ),
+              ), // fream
+              SizedBox(
+                height: 80,
+                width: 80,
+                child: Image(
+                  image: AssetImage("assets/icon/frem1.png"),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      const Text(
+        "Owner",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 9,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildOccupiedSeat(BuildContext context, JoinedMembers user, bool isTalking) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      InkWell(
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (_) => UserRoomProfileCard(uid: "${user.userId}"),
+          );
+        },
+        child:
+        Container(
+          padding: EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isTalking ? Colors.greenAccent : Colors.transparent,
+              width: 3,
+            ),
+            boxShadow: isTalking
+                ? [
+              BoxShadow(
+                color: Colors.greenAccent.withOpacity(0.5),
+                blurRadius: 8,
+                spreadRadius: 2,
+              ),
+            ]
+                : null,
+          ),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(user.profileImage ?? ""),
+            radius: 20,
+          ),
+        ),
+      ),
+      Text(
+        user.name ?? "",
+        style: TextStyle(color: Colors.white, fontSize: 10),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
+    ],
+  );
+}
+
+Widget _buildEmptySeat(BuildContext context, int seatNumber, String roomId,String userid,String adminId) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      InkWell(
+        onTap: () {
+          if(userid!=adminId){
+           context.read<RoomBloc>().add(SwitchSeatEvent(roomId, seatNumber));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Seat switching to $seatNumber.Please wait...."),
+              ),
+            );
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Admin cannot switch seat."),
+              ),
+            );
+          }
+        },
+        child: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.transparent,
+            border: Border.all(
+              color: Colors.grey.withOpacity(0.3),
+              width: 2,
+            ),
+          ),
+          child: Icon(Icons.add, color: Colors.grey.withOpacity(0.6), size: 24),
+        ),
+      ),
+      SizedBox(height: 4),
+      Text(
+        "Seat $seatNumber",
+        style: TextStyle(
+          color: Colors.grey.withOpacity(0.7),
+          fontSize: 10,
+        ),
+      ),
+    ],
+  );
+}
+
+
+//🎤 Grid of Seats
+// Container(
+// height: MediaQuery.of(context).size.height * 0.4,
+// decoration: BoxDecoration(color: Colors.transparent),
+// width: double.infinity,
+// child: BlocBuilder<RoomBloc, RoomState>(
+// builder: (context, state) {
+// if (state is RoomLoading || state is JoiningRoomLoading) {
+// return Center(child: CircularProgressIndicator());
+// }
+// if (state is RoomLoaded) {
+// final totalSeats = state.singleRoomResponse.data?.seat ?? 0;
+//
+// final seatMap = {
+// for (var user in state.singleRoomResponse.data?.joinedMembers ?? <JoinedMembers>[])
+// user.seatNo : user,
+// };
+// return StreamBuilder<Map<int, int>>(
+// stream: ApiConstants.volumeStream,
+// builder: (context, volumeSnapshot) {
+// final volumeMapData = volumeSnapshot.data ?? <int, int>{};
+// return GridView.builder(
+// padding: EdgeInsets.all(16),
+// gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+// crossAxisCount: 4,
+// mainAxisSpacing: 3,
+// crossAxisSpacing: 16,
+// childAspectRatio: 0.85,
+// ),
+// itemCount: totalSeats,
+// itemBuilder: (context, index) {
+// final seatNumber = index;
+// final user = seatMap[seatNumber];
+// bool isCurrentUserTalking = false;
+//
+// if (user?.userId != null && user!.userId is int) {
+// final agoraUserid = user.userId as int;
+// const int talkingThreshold = 5;
+// final currentVolume = volumeMapData[agoraUserid] ?? 0;
+// isCurrentUserTalking = currentVolume > talkingThreshold;
+// }
+//
+// if (user != null) {
+// // Seat occupied by a user
+// return LayoutBuilder(
+// builder: (context, constraints) {
+// return Column(
+// mainAxisSize: MainAxisSize.min,
+// children: [
+// Flexible(
+// flex: 7,
+// child: InkWell(
+// onTap: () {
+// showModalBottomSheet(
+// context: context,
+// builder:
+// (_,) => UserRoomProfileCard(
+// uid: "${user.userId}",
+// ),
+// );
+// },
+// child: Container(
+// padding: EdgeInsets.all(2),
+// decoration: BoxDecoration(
+// shape: BoxShape.circle,
+// border: Border.all(
+// color:
+// isCurrentUserTalking ? Colors.greenAccent : Colors.transparent,
+// width: 3,
+// ),
+// // Add a subtle glow effect when talking
+// boxShadow: isCurrentUserTalking ? [BoxShadow(color: Colors.greenAccent.withOpacity(0.5),
+// blurRadius: 8,
+// spreadRadius: 2,),] : null,
+// ),
+// child: CircleAvatar(
+// backgroundImage: NetworkImage(
+// user.profileImage ?? "",
+// ),
+// radius: 20,
+// ),
+// ),
+// ),
+// ),
+// Flexible(
+// flex: 3,
+// child: Column(
+// mainAxisSize: MainAxisSize.min,
+// mainAxisAlignment:
+// MainAxisAlignment.center,
+// children: [
+// Flexible(
+// child: Text(
+// user.name ?? "",
+// style: TextStyle(
+// color: Colors.white,
+// fontSize: 10,
+// ),
+// overflow:
+// TextOverflow.ellipsis,
+// maxLines: 1,
+// ),
+// ),
+// Flexible(
+// child: Row(
+// mainAxisAlignment:
+// MainAxisAlignment
+//     .center,
+// mainAxisSize:
+// MainAxisSize.min,
+// children: [
+// SizedBox(
+// height: 10,
+// width: 10,
+// child: Image.asset(
+// "assets/icon/diamond 1.png",
+// ),
+// ),
+// SizedBox(width: 1),
+// Text(
+// "15.5k",
+// style: TextStyle(
+// color: Colors.amber,
+// fontSize: 9,
+// ),
+// ),
+// ],
+// ),
+// ),
+// ],
+// ),
+// ),
+// ],
+// );
+// },
+// );
+// } else {
+// // Empty seat - make it more subtle and consistent
+// return Column(
+// mainAxisSize: MainAxisSize.min,
+// children: [
+// InkWell(
+// onTap: () {
+// if (state.singleRoomResponse.data?.createdBy?.userId == user?.userId) {
+// ScaffoldMessenger.of(context).showSnackBar(
+// SnackBar(
+// content: Text("Admin cannot switch seat."),
+// ),
+// );
+// return;
+// }else{
+// context.read<RoomBloc>().add(SwitchSeatEvent(widget.roomId, seatNumber));
+// ScaffoldMessenger.of(context).showSnackBar(
+// SnackBar(
+// content: Text("Seat switching to $seatNumber. Please wait...."),
+// ),
+// );
+// }
+// },
+// child: Container(
+// width: 50,
+// height: 50,
+// decoration: BoxDecoration(
+// shape: BoxShape.circle,
+// color: Colors.transparent,
+// border: Border.all(
+// color: Colors.grey.withOpacity(0.3),
+// width: 2,
+// ),
+// ),
+// child: Icon(
+// Icons.add,
+// color: Colors.grey.withOpacity(0.6),
+// size: 24,
+// ),
+// ),
+// ),
+// SizedBox(height: 4),
+// Text(
+// "Seat $seatNumber",
+// style: TextStyle(
+// color: Colors.grey.withOpacity(0.7),
+// fontSize: 10,
+// ),
+// ),
+// ],
+// );
+// }
+// },
+// );
+// },
+// );
+// }
+// if (state is RoomError) {
+// return Center(
+// child: Column(
+// mainAxisAlignment: MainAxisAlignment.center,
+// children: [
+// Icon(Icons.error, color: Colors.red, size: 48),
+// SizedBox(height: 8),
+// Text(
+// "Failed to load room",
+// style: TextStyle(
+// color: Colors.white,
+// fontSize: 16,
+// ),
+// ),
+// Text(
+// state.errorMessage,
+// style: TextStyle(
+// color: Colors.grey,
+// fontSize: 12,
+// ),
+// textAlign: TextAlign.center,
+// ),
+// ],
+// ),
+// );
+// }
+// // Default state - show loading or empty state
+// return Center(
+// child: Column(
+// mainAxisAlignment: MainAxisAlignment.center,
+// children: [
+// CircularProgressIndicator(),
+// SizedBox(height: 16),
+// Text(
+// "Loading room...",
+// style: TextStyle(color: Colors.white),
+// ),
+// ],
+// ),
+// );
+// },
+// ),
+// ),
+//
+

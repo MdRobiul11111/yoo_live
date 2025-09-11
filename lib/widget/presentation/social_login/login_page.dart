@@ -30,6 +30,8 @@ class _LoginPageState extends State<LoginPage> {
               context,
               MaterialPageRoute(builder: (context) => RootPage()),
             );
+          }else if(state is AuthStateLoading){
+            Center(child: CircularProgressIndicator());
           }
         },
         child: Container(
