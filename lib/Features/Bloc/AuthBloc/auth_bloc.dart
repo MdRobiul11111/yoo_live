@@ -28,8 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignInWithGoogleRequested event,
     Emitter<AuthState> emit,
   ) async {
-    final result = await authDataRepository.signInWithGoogle();
     emit(AuthStateLoading());
+    final result = await authDataRepository.signInWithGoogle();
     result.fold(
       (error) => emit(AuthError(error.toString())),
       (userModel) =>
