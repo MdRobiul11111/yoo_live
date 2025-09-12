@@ -80,7 +80,7 @@ void initDependency() async{
   sl<Dio>().interceptors.add(AuthInterceptor(sl(),sl(),sl()));
   sl.registerLazySingleton<AuthDataRepository>(()=>AuthDataRepositoryImpl(sl()));
   sl.registerLazySingleton(()=>AuthBloc(sl(),sl()));
-  sl.registerLazySingleton(()=>AuthProfileBloc(sl()));
+  sl.registerLazySingleton(()=>AuthProfileBloc(sl(),sl()));
   sl.registerLazySingleton(()=>SearchProfileBloc(sl()));
   sl.registerLazySingleton(()=>CreatedLiveRoomBloc(sl(),sl(),sl()));
   sl.registerLazySingleton(()=>CreateRoomBloc(sl()));

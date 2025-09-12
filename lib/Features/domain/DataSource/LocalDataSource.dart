@@ -6,7 +6,6 @@ import '../../../Constants/ApiConstants.dart';
 abstract class LocalDataSource{
   Future<String?> getAccessToken();
   Future<String?> getRefreshToken();
-  Future<void> clearUserData();
   Future<bool> isUserSignedIn();
   Future<void> setNewAccessToken(String newAccessToken);
   Future<DateTime?> getIssuedAt();
@@ -16,22 +15,7 @@ abstract class LocalDataSource{
 class LocalDataSourceImpl extends LocalDataSource {
   final SharedPreferences sharedPreferences;
 
-
   LocalDataSourceImpl(this.sharedPreferences);
-
-  @override
-  Future<void> clearUserData() async{
-    try {
-      await Future.wait([
-        sharedPreferences.remove(ApiConstants.accessTokenKey),
-        sharedPreferences.remove(ApiConstants.refreshTokenKey),
-        sharedPreferences.remove(ApiConstants.userDataKey),
-        sharedPreferences.remove(ApiConstants.issuedAtKey),
-      ]);
-    } catch (e) {
-      throw CacheFailure( message:'Failed to clear user data');
-    }
-  }
 
   @override
   Future<String?> getAccessToken() async{

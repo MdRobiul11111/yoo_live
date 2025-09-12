@@ -29,3 +29,11 @@ class AuthProfileError extends AuthProfileState{
   @override
   List<Object?> get props => [message];
 }
+
+
+class SuccessfullyLogout extends AuthProfileState{
+  const SuccessfullyLogout();
+
+  @override
+  List<Object?> get props => [];
+}

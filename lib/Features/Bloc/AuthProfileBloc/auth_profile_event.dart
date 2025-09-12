@@ -9,3 +9,5 @@ abstract class AuthProfileEvent extends Equatable{
 }
 
 class FetchAuthProfileDetails extends AuthProfileEvent{}
+
+class LogOutUser extends AuthProfileEvent{}
