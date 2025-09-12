@@ -19,3 +19,12 @@ class FetchSearchedProfile extends SearchProfileEvent{
   List<Object> get props => [query];
 
 }
+
+
+class ResetSearchPage extends SearchProfileEvent{
+
+  const ResetSearchPage();
+
+  @override
+  List<Object> get props => [];
+}

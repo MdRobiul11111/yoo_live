@@ -15,6 +15,7 @@ class SearchProfileBloc extends Bloc<SearchProfileEvent, SearchProfileState> {
   SearchProfileBloc(this.authDataRepository)
     : super(SearchProfileStateInitial()) {
     on<FetchSearchedProfile>(_onFetchSearchedProfile);
+    on<ResetSearchPage>(_onResetSearchPage);
   }
 
   FutureOr<void> _onFetchSearchedProfile(
@@ -34,5 +35,9 @@ class SearchProfileBloc extends Bloc<SearchProfileEvent, SearchProfileState> {
         ),
       ),
     );
+  }
+
+  Future<void> _onResetSearchPage(ResetSearchPage event, Emitter<SearchProfileState> emit) async{
+      emit(SearchProfileStateInitial());
   }
 }

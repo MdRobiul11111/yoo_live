@@ -1,11 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yoo_live/Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
 import 'package:yoo_live/widget/presentation/home/search_page/search_page.dart';
-import 'package:yoo_live/widget/presentation/notification_widget/notification_page.dart';
 
+import '../../../Features/Bloc/CreatedLiveRoomsBloC/created_live_room_bloc.dart';
 import '../audio_live_host_view_widget/audio_room_page.dart';
+import '../notification_widget/notification_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -111,6 +112,7 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.white,
                       backgroundColor: Colors.pink,
                       child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Column(
@@ -119,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                                 itemCount: state.sliderResponse.data?.length,
                                 itemBuilder: (context, index, realIndex) {
                                   final rooms =
-                                      state.sliderResponse.data?[index];
+                                  state.sliderResponse.data?[index];
                                   return Stack(
                                     children: [
                                       ClipRRect(
@@ -157,16 +159,16 @@ class _HomePageState extends State<HomePage> {
                                               if (rooms?.status == "ACTIVE")
                                                 Container(
                                                   padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 2,
-                                                      ),
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
                                                   decoration: BoxDecoration(
                                                     color: Colors.red,
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                          8,
-                                                        ),
+                                                    BorderRadius.circular(
+                                                      8,
+                                                    ),
                                                   ),
                                                   child: const Text(
                                                     "Live",
@@ -221,30 +223,30 @@ class _HomePageState extends State<HomePage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children:
-                                    state.sliderResponse.data!
-                                        .asMap()
-                                        .entries
-                                        .map((entry) {
-                                          return Container(
-                                            width:
-                                                _currentIndex == entry.key
-                                                    ? 10.0
-                                                    : 6.0,
-                                            height: 6.0,
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 3.0,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(3),
-                                              color:
-                                                  _currentIndex == entry.key
-                                                      ? Colors.pink
-                                                      : Colors.grey,
-                                            ),
-                                          );
-                                        })
-                                        .toList(),
+                                state.sliderResponse.data!
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
+                                  return Container(
+                                    width:
+                                    _currentIndex == entry.key
+                                        ? 10.0
+                                        : 6.0,
+                                    height: 6.0,
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 3.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius.circular(3),
+                                      color:
+                                      _currentIndex == entry.key
+                                          ? Colors.pink
+                                          : Colors.grey,
+                                    ),
+                                  );
+                                })
+                                    .toList(),
                               ),
                               SizedBox(height: 16),
 
@@ -253,12 +255,12 @@ class _HomePageState extends State<HomePage> {
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 12,
-                                      mainAxisSpacing: 12,
-                                      childAspectRatio: 0.8,
-                                    ),
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 0.8,
+                                ),
                                 itemBuilder: (context, index) {
                                   final rooms = state.rooms.data![index];
                                   return InkWell(
@@ -294,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                                                   0.8,
                                                 ),
                                                 borderRadius:
-                                                    BorderRadius.circular(20),
+                                                BorderRadius.circular(20),
                                               ),
                                               child: Row(
                                                 children: [
@@ -327,7 +329,7 @@ class _HomePageState extends State<HomePage> {
                                                 0.6,
                                               ),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                              BorderRadius.circular(20),
                                             ),
                                             child: Row(
                                               children: [

@@ -18,6 +18,13 @@ class _SearchPageState extends State<SearchPage> {
   TextEditingController searchController = TextEditingController();
 
   @override
+  void dispose() {
+    searchController.dispose();
+    context.read<SearchProfileBloc>().add(ResetSearchPage());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black87,
@@ -28,6 +35,7 @@ class _SearchPageState extends State<SearchPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
+            context.read<SearchProfileBloc>().add(ResetSearchPage());
           },
         ),
         title: const Text("", style: TextStyle(color: Colors.white)),
@@ -63,6 +71,7 @@ class _SearchPageState extends State<SearchPage> {
                     icon: const Icon(Icons.search, color: Colors.white54),
                     onPressed: () {
                       searchedProfile(searchController.text);
+                      searchController.clear();
                     },
                   ),
                 ],
