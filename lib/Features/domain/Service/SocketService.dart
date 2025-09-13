@@ -35,6 +35,10 @@ class SocketService {
   final StreamController<SocketUserSwitchSeat> _userSwitchSeatController = StreamController<SocketUserSwitchSeat>.broadcast();
   Stream<SocketUserSwitchSeat> get userSwitchSeatStream => _userSwitchSeatController.stream;
 
+  //get message
+  final StreamController<SocketMessageModel> _messageController = StreamController<SocketMessageModel>.broadcast();
+  Stream<SocketMessageModel> get messageStream => _messageController.stream;
+
 
   Future<void> connect() async {
     if (_socket != null && _socket!.connected) {
@@ -96,9 +100,9 @@ class SocketService {
     });
 
     _socket!.on('new-room-message', (data) {
-       print('new-room-message event received: $data');
+      // print('new-room-message event received: $data');
        final message = SocketMessageModel.fromJson(data);
-       ApiConstants.addNewMessage(message);
+       _messageController.add(message);
     });
     
     _socket!.on("room-message-sent", (data){

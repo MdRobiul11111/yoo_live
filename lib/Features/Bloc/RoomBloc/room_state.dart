@@ -12,16 +12,17 @@ class RoomLoading extends RoomState {}
 class RoomLoaded extends RoomState {
   final SingleRoomResponse singleRoomResponse;
   final String? currentUserId;
+  final RoomMessagesModel roomMessagesModel;
 
 
-  RoomLoaded(this.singleRoomResponse,this.currentUserId);
+  RoomLoaded(this.singleRoomResponse,this.currentUserId,this.roomMessagesModel);
 
-  RoomLoaded copyWith({SingleRoomResponse? singleRoomResponse}) {
-    return RoomLoaded(singleRoomResponse ?? this.singleRoomResponse,currentUserId);
+  RoomLoaded copyWith({SingleRoomResponse? singleRoomResponse, String? currentUserId, RoomMessagesModel? roomMessagesModel}) {
+    return RoomLoaded(singleRoomResponse ?? this.singleRoomResponse,currentUserId,roomMessagesModel ?? this.roomMessagesModel);
   }
 
   @override
-  List<Object?> get props => [singleRoomResponse,currentUserId];
+  List<Object?> get props => [singleRoomResponse,currentUserId,roomMessagesModel];
 }
 
 class RoomError extends RoomState {

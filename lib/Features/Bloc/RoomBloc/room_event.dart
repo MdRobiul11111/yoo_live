@@ -108,4 +108,22 @@ class SocketSeatSwitchEvent extends RoomEvent{
   List<Object?> get props => [socketUserSwitchSeat];
 }
 
+class NewMessageReceived extends RoomEvent{
+  final SocketMessageModel socketMessageModel;
+
+  const NewMessageReceived(this.socketMessageModel);
+
+  @override
+  List<Object?> get props => [socketMessageModel];
+}
+
+class ExistingMessageReceived extends RoomEvent{
+   final String roomId;
+
+  const ExistingMessageReceived(this.roomId);
+
+  @override
+  List<Object?> get props => [roomId];
+}
+
 

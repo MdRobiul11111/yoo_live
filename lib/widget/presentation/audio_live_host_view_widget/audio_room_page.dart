@@ -11,6 +11,7 @@ import 'package:yoo_live/widget/presentation/audio_live_host_view_widget/room_wi
 import 'package:yoo_live/widget/presentation/root/root_page.dart';
 
 import '../../../Constants/ApiConstants.dart';
+import '../../../Features/domain/Model/RoomMessageModel.dart';
 
 class AudioRoomPage extends StatefulWidget {
   final String roomId;
@@ -608,42 +609,10 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                 ),
 
                 SizedBox(height: 30),
-                // 💬 Chat Messages sections
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  alignment: Alignment.bottomCenter,
-                  child: StreamBuilder<List<SocketMessageModel>>(
-                    stream: ApiConstants.messages,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final messages = snapshot.data!; // The data is a list of messages
-                        return ListView.builder(
-                          itemCount: messages.length,
-                          // Use the length of the list
-                          itemBuilder: (context, index) {
-                            final message = messages[index];
-                            return ListItemWidget(
-                              name: message.name ?? "",
-                              message: message.content ?? "",
-                            );
-                          },
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(child: Text('An error occurred!'));
-                      } else {
-                        return const Center(
-                          child: Text(
-                            'No messages yet.',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
 
-                // 🧰 Bottom Bar sections
+                // 💬 Chat Messages sections
+                ChatSection(),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -690,6 +659,31 @@ class _AudioRoomPageState extends State<AudioRoomPage> with WidgetsBindingObserv
                         },
                       ),
 
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF3D1E4F),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child: CallRequestDefaulttabButton(),
+                              );
+                            },
+                          );
+                        },
+                        child: Icon(
+                          Icons.phone,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
+                      SizedBox(width: 17),
                       // InkWell(
                       //   onTap: () {},
                       //   child: Container(
@@ -976,242 +970,86 @@ Widget _buildEmptySeat(BuildContext context, int seatNumber, String roomId,Strin
   );
 }
 
+class ChatSection extends StatefulWidget {
+  const ChatSection({super.key});
 
-//🎤 Grid of Seats
-// Container(
-// height: MediaQuery.of(context).size.height * 0.4,
-// decoration: BoxDecoration(color: Colors.transparent),
-// width: double.infinity,
-// child: BlocBuilder<RoomBloc, RoomState>(
-// builder: (context, state) {
-// if (state is RoomLoading || state is JoiningRoomLoading) {
-// return Center(child: CircularProgressIndicator());
-// }
-// if (state is RoomLoaded) {
-// final totalSeats = state.singleRoomResponse.data?.seat ?? 0;
-//
-// final seatMap = {
-// for (var user in state.singleRoomResponse.data?.joinedMembers ?? <JoinedMembers>[])
-// user.seatNo : user,
-// };
-// return StreamBuilder<Map<int, int>>(
-// stream: ApiConstants.volumeStream,
-// builder: (context, volumeSnapshot) {
-// final volumeMapData = volumeSnapshot.data ?? <int, int>{};
-// return GridView.builder(
-// padding: EdgeInsets.all(16),
-// gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-// crossAxisCount: 4,
-// mainAxisSpacing: 3,
-// crossAxisSpacing: 16,
-// childAspectRatio: 0.85,
-// ),
-// itemCount: totalSeats,
-// itemBuilder: (context, index) {
-// final seatNumber = index;
-// final user = seatMap[seatNumber];
-// bool isCurrentUserTalking = false;
-//
-// if (user?.userId != null && user!.userId is int) {
-// final agoraUserid = user.userId as int;
-// const int talkingThreshold = 5;
-// final currentVolume = volumeMapData[agoraUserid] ?? 0;
-// isCurrentUserTalking = currentVolume > talkingThreshold;
-// }
-//
-// if (user != null) {
-// // Seat occupied by a user
-// return LayoutBuilder(
-// builder: (context, constraints) {
-// return Column(
-// mainAxisSize: MainAxisSize.min,
-// children: [
-// Flexible(
-// flex: 7,
-// child: InkWell(
-// onTap: () {
-// showModalBottomSheet(
-// context: context,
-// builder:
-// (_,) => UserRoomProfileCard(
-// uid: "${user.userId}",
-// ),
-// );
-// },
-// child: Container(
-// padding: EdgeInsets.all(2),
-// decoration: BoxDecoration(
-// shape: BoxShape.circle,
-// border: Border.all(
-// color:
-// isCurrentUserTalking ? Colors.greenAccent : Colors.transparent,
-// width: 3,
-// ),
-// // Add a subtle glow effect when talking
-// boxShadow: isCurrentUserTalking ? [BoxShadow(color: Colors.greenAccent.withOpacity(0.5),
-// blurRadius: 8,
-// spreadRadius: 2,),] : null,
-// ),
-// child: CircleAvatar(
-// backgroundImage: NetworkImage(
-// user.profileImage ?? "",
-// ),
-// radius: 20,
-// ),
-// ),
-// ),
-// ),
-// Flexible(
-// flex: 3,
-// child: Column(
-// mainAxisSize: MainAxisSize.min,
-// mainAxisAlignment:
-// MainAxisAlignment.center,
-// children: [
-// Flexible(
-// child: Text(
-// user.name ?? "",
-// style: TextStyle(
-// color: Colors.white,
-// fontSize: 10,
-// ),
-// overflow:
-// TextOverflow.ellipsis,
-// maxLines: 1,
-// ),
-// ),
-// Flexible(
-// child: Row(
-// mainAxisAlignment:
-// MainAxisAlignment
-//     .center,
-// mainAxisSize:
-// MainAxisSize.min,
-// children: [
-// SizedBox(
-// height: 10,
-// width: 10,
-// child: Image.asset(
-// "assets/icon/diamond 1.png",
-// ),
-// ),
-// SizedBox(width: 1),
-// Text(
-// "15.5k",
-// style: TextStyle(
-// color: Colors.amber,
-// fontSize: 9,
-// ),
-// ),
-// ],
-// ),
-// ),
-// ],
-// ),
-// ),
-// ],
-// );
-// },
-// );
-// } else {
-// // Empty seat - make it more subtle and consistent
-// return Column(
-// mainAxisSize: MainAxisSize.min,
-// children: [
-// InkWell(
-// onTap: () {
-// if (state.singleRoomResponse.data?.createdBy?.userId == user?.userId) {
-// ScaffoldMessenger.of(context).showSnackBar(
-// SnackBar(
-// content: Text("Admin cannot switch seat."),
-// ),
-// );
-// return;
-// }else{
-// context.read<RoomBloc>().add(SwitchSeatEvent(widget.roomId, seatNumber));
-// ScaffoldMessenger.of(context).showSnackBar(
-// SnackBar(
-// content: Text("Seat switching to $seatNumber. Please wait...."),
-// ),
-// );
-// }
-// },
-// child: Container(
-// width: 50,
-// height: 50,
-// decoration: BoxDecoration(
-// shape: BoxShape.circle,
-// color: Colors.transparent,
-// border: Border.all(
-// color: Colors.grey.withOpacity(0.3),
-// width: 2,
-// ),
-// ),
-// child: Icon(
-// Icons.add,
-// color: Colors.grey.withOpacity(0.6),
-// size: 24,
-// ),
-// ),
-// ),
-// SizedBox(height: 4),
-// Text(
-// "Seat $seatNumber",
-// style: TextStyle(
-// color: Colors.grey.withOpacity(0.7),
-// fontSize: 10,
-// ),
-// ),
-// ],
-// );
-// }
-// },
-// );
-// },
-// );
-// }
-// if (state is RoomError) {
-// return Center(
-// child: Column(
-// mainAxisAlignment: MainAxisAlignment.center,
-// children: [
-// Icon(Icons.error, color: Colors.red, size: 48),
-// SizedBox(height: 8),
-// Text(
-// "Failed to load room",
-// style: TextStyle(
-// color: Colors.white,
-// fontSize: 16,
-// ),
-// ),
-// Text(
-// state.errorMessage,
-// style: TextStyle(
-// color: Colors.grey,
-// fontSize: 12,
-// ),
-// textAlign: TextAlign.center,
-// ),
-// ],
-// ),
-// );
-// }
-// // Default state - show loading or empty state
-// return Center(
-// child: Column(
-// mainAxisAlignment: MainAxisAlignment.center,
-// children: [
-// CircularProgressIndicator(),
-// SizedBox(height: 16),
-// Text(
-// "Loading room...",
-// style: TextStyle(color: Colors.white),
-// ),
-// ],
-// ),
-// );
-// },
-// ),
-// ),
-//
+  @override
+  _ChatSectionState createState() => _ChatSectionState();
+}
 
+class _ChatSectionState extends State<ChatSection> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<RoomBloc, RoomState>(
+      listener: (context, state) {
+        if (state is RoomLoaded) {
+          // Add a post-frame callback to ensure the list has rendered
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollToBottom();
+          });
+        }
+      },
+      child:
+      BlocBuilder<RoomBloc, RoomState>(
+        builder: (context, state) {
+          if (state is RoomLoaded) {
+            final roomMessages = state.roomMessagesModel.data ?? []; // Ensure it's not null
+
+            // Check if the list is empty and display a message
+            if (roomMessages.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(8),
+                height: MediaQuery.of(context).size.height * 0.15,
+                alignment: Alignment.bottomCenter,
+                child: const Center(
+                  child: Text(
+                    "No messages yet.",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            }
+
+            // If there are messages, display the list view
+            return Container(
+              padding: const EdgeInsets.all(8),
+              height: MediaQuery.of(context).size.height * 0.15,
+              alignment: Alignment.bottomCenter,
+              child: ListView.builder(
+                reverse: true,
+                itemCount: roomMessages.length,
+                itemBuilder: (context, index) {
+                  final message = roomMessages[index];
+                  return ListItemWidget(
+                    name: message.name ?? "",
+                    message: message.content ?? "",
+                  );
+                },
+              ),
+            );
+          }
+          return Container(
+            padding: const EdgeInsets.all(8),
+            height: MediaQuery.of(context).size.height * 0.15,
+            alignment: Alignment.bottomCenter,
+            child: const Text(""),
+          );
+        },
+      ),
+    );
+  }
+}

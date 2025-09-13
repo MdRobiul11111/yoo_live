@@ -15,6 +15,7 @@ import 'package:yoo_live/Features/domain/Model/FacebookSignInReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/JoinedCallResponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
 import 'package:yoo_live/Features/domain/Model/MuteMemberResponse.dart';
+import 'package:yoo_live/Features/domain/Model/RoomMessageModel.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SignInTokenReponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
@@ -62,6 +63,8 @@ abstract class AuthDataSource {
   );
 
   Future<ApiResult<SliderResponse>> fetchSlider();
+
+  Future<ApiResult<RoomMessagesModel>> fetchRoomMessages(String roomId);
 }
 
 class AuthDataSourceImpl extends AuthDataSource {
@@ -403,6 +406,15 @@ class AuthDataSourceImpl extends AuthDataSource {
       '/api/v1/sliders',
       method: 'GET',
       parser: (json) => SliderResponse.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<RoomMessagesModel>> fetchRoomMessages(String roomId) {
+    return _dioClient.apiResponseHandler(
+      '/api/v1/messages/room/$roomId',
+      method: 'GET',
+      parser: (json) => RoomMessagesModel.fromJson(json),
     );
   }
 }

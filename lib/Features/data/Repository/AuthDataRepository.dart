@@ -7,6 +7,7 @@ import 'package:yoo_live/Features/domain/Model/AuthProfile.dart';
 import 'package:yoo_live/Features/domain/Model/JoinedCallResponseModel.dart';
 import 'package:yoo_live/Features/domain/Model/LeaveCallReponse.dart';
 import 'package:yoo_live/Features/domain/Model/MuteMemberResponse.dart';
+import 'package:yoo_live/Features/domain/Model/RoomMessageModel.dart';
 import 'package:yoo_live/Features/domain/Model/SearchProfileResponse.dart';
 import 'package:yoo_live/Features/domain/Model/SingleRoomModelResponse.dart';
 import 'package:yoo_live/Features/domain/Model/ToJoinCallResponseModel.dart';
@@ -39,6 +40,7 @@ abstract class AuthDataRepository {
   Future<Either<Failure, MuteMemberResponse>> muteMember(String roomId, String userId, bool isMute);
   Future<Either<Failure, JoinedCallReponseModel>> joinedCallResponse(String roomId, String status);
   Future<Either<Failure, SliderResponse>> fetchSlider();
+  Future<Either<Failure, RoomMessagesModel>> fetchRoomMessages(String roomId);
 
 
 }
@@ -173,6 +175,14 @@ class AuthDataRepositoryImpl extends AuthDataRepository {
     return authDataSource.fetchSlider().then((value) => value.when(
       (data, success) => Right(data),
       (failure, statusCode) => Left(failure),
+    ));
+  }
+
+  @override
+  Future<Either<Failure, RoomMessagesModel>> fetchRoomMessages(String roomId) {
+    return authDataSource.fetchRoomMessages(roomId).then((value) => value.when(
+          (data, success) => Right(data),
+          (failure, statusCode) => Left(failure),
     ));
   }
 }

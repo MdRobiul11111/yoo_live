@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import '../Features/domain/Model/SocketMessageModel.dart';
-
 class ApiConstants{
 
   static const String accessTokenKey = 'access_token';
@@ -19,14 +17,6 @@ class ApiConstants{
   static void updateUserVolume(int uid, int volume) {
     _currentVolumes[uid] = volume;
     volumeController.add(Map.from(_currentVolumes));
-  }
-    static final List<SocketMessageModel> _currentMessages = [];
-    static final StreamController<List<SocketMessageModel>> _messageController = StreamController<List<SocketMessageModel>>.broadcast();
-    static Stream<List<SocketMessageModel>> get messages => _messageController.stream;
-
-    static void addNewMessage(SocketMessageModel message) {
-      _currentMessages.add(message);
-      _messageController.add(List.of(_currentMessages));
   }
 
 }
